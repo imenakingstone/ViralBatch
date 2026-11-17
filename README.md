@@ -58,3 +58,5 @@ Authentication UI/session handling, saving batches to Supabase, subscription/cre
 
 ## Important
 This project is not production-ready until dependencies are installed, type/lint/build checks pass, auth and RLS are tested, secrets are configured securely, and real Kinyarwanda outputs are reviewed by fluent speakers. Provider pricing, availability, and model support can change; verify before launch.
+
+**Production safety:** The generation endpoint is currently an MVP endpoint without user authentication or durable rate limiting. Do not deploy it with a billable AI key or open it to public traffic until authentication, per-user usage limits, abuse protection, and monitoring are implemented.
