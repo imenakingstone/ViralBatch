@@ -82,8 +82,8 @@ There is no project clearly named ViralBatch. The FREE-CROSSPOSTER project must 
 1. Build the browser upload UI using the signed-upload and job APIs.
 2. Add file duration/metadata validation and secure upload cleanup.
 3. Add a processing adapter interface and background job contract.
-4. Research/evaluate speech-to-text options for Kinyarwanda and English.
-5. Add tests for auth gates, quotas, ownership, media validation, and job lifecycle.
+4. Add tests for auth gates, quotas, ownership, media validation, and job lifecycle.
+5. Implement a configurable transcription provider after the consented Kinyarwanda benchmark set is prepared.
 
 ## Development rules
 - Keep all work cloud-first; do not require the user's local PC.
@@ -98,4 +98,7 @@ There is no project clearly named ViralBatch. The FREE-CROSSPOSTER project must 
 - Added the third migration for private media storage and owner-scoped media jobs.
 - Added authenticated signed-upload URL creation, upload job listing, and upload confirmation APIs.
 - Added a browser upload panel wired to Supabase Storage signed uploads, with file type/size selection and success/error states.
+- Hardened media job creation/state transitions with restricted column grants and an owner-checked database RPC.
+- Researched Google Cloud Speech-to-Text V2 and Pindo as Kinyarwanda transcription candidates; added an evaluation plan and WER/CER utility.
+- Added an ASR evaluation guide that keeps private audio and transcripts out of the public repository.
 - Updated README and master blueprint with current capabilities and remaining human approvals.
