@@ -16,6 +16,7 @@ ViralBatch is a cloud-first content studio for turning scripts and transcripts i
 - Supabase email/password auth and saved batch history (configuration-dependent).
 - Supabase RLS migrations for user-owned profiles/batches.
 - Atomic daily live-generation quota: 30 requests per signed-in user per UTC day (requires the second migration).
+- Private source-media bucket, owner-scoped media job records, and authenticated signed-upload/job APIs (requires the third migration).
 
 ## Cloud development (GitHub Codespaces)
 
@@ -42,21 +43,21 @@ Restart the development server after changing environment variables. Never add a
 
 ## Supabase setup (human approval required)
 1. Confirm the intended Supabase project.
-2. Review both SQL files in `supabase/migrations/` in filename order.
-3. Apply both migrations in the Supabase SQL Editor only after confirming the project and reviewing the SQL.
+2. Review all three SQL files in `supabase/migrations/` in filename order.
+3. Apply all three migrations in the Supabase SQL Editor only after confirming the project and reviewing the SQL.
 4. Add `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` to your environment. The sign-in/sign-up UI and cookie-based SSR clients are implemented; authentication will work only after valid project settings and the migration are in place.
 
-The migrations create profiles, saved batches, and a private usage ledger; enable RLS; and scope user data to the signed-in user. The quota function atomically limits live AI generation to 30 requests per user per UTC day. The migrations have not been applied to any database by this repository change.
+The migrations create profiles, saved batches, a private usage ledger, and media processing job records; enable RLS; and scope user data to the signed-in user. The second migration limits live AI generation to 30 requests per user per UTC day. The third migration creates a private `source-media` bucket (512 MB per object) with per-user Storage policies. No migrations have been applied to a database.
 
 ## API
-`POST /api/generate` accepts script, language, tone, and count. The API validates input and uses the OpenAI Chat Completions API only from the server. If no key is present, it returns an explicitly marked demo result.
+`POST /api/generate` accepts script, language, tone, and count. `GET /api/usage` returns the signed-in user's daily quota. `POST /api/media/upload-url` creates a short-lived signed upload token for a validated audio/video file. `GET /api/media/jobs` lists the current user's media jobs; `PATCH /api/media/jobs` confirms an uploaded object exists. The API validates input and uses the OpenAI Chat Completions API only from the server. If no key is present, it returns an explicitly marked demo result.
 
 ## Project documents
 - PROGRESS.md — progress tracker.
 - CHAT_HISTORY_AND_BLUEPRINT.md — conversation history and product blueprint.
 
 ## Not implemented yet
-Paid subscription/credit plans, Kinyarwanda transcription, audio/video upload, clip selection, FFmpeg rendering, subtitles, background jobs, publishing integrations, and production deployment.
+Paid subscription/credit plans, actual browser upload UI, Kinyarwanda transcription, audio/video inspection, clip selection, FFmpeg rendering, subtitles, background workers, publishing integrations, and production deployment.
 
 ## Important
 This project is not production-ready until dependencies are installed, type/lint/build checks pass, auth and RLS are tested, secrets are configured securely, and real Kinyarwanda outputs are reviewed by fluent speakers. Provider pricing, availability, and model support can change; verify before launch.
