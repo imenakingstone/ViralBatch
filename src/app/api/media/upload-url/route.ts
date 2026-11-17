@@ -63,7 +63,6 @@ export async function POST(request: Request) {
     original_filename: filename,
     mime_type: contentType,
     size_bytes: sizeBytes,
-    status: "awaiting_upload"
   });
 
   if (insertError) {
