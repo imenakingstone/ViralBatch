@@ -318,3 +318,5 @@ Important remaining safety work: do not expose the AI generation endpoint with a
 - Added owner-authorized deletion of saved batches from the history page.
 - Updated README and PROGRESS.md to reflect the actual implementation and the remaining human setup.
 - These database-backed features still require the correct Supabase project to be confirmed and both migrations to be applied. They have not been live-tested.
+
+- Added a signed-in usage summary endpoint and a studio display for remaining daily live AI generations. The summary is returned by a separate read-only database function; clients cannot read the private usage ledger directly.
