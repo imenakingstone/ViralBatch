@@ -26,10 +26,6 @@ create policy "Users can view own media jobs" on public.media_jobs
 drop policy if exists "Users can create own media jobs" on public.media_jobs;
 create policy "Users can create own media jobs" on public.media_jobs
   for insert to authenticated with check ((select auth.uid()) = user_id);
-drop policy if exists "Users can update own media jobs" on public.media_jobs;
-create policy "Users can update own media jobs" on public.media_jobs
-  for update to authenticated using ((select auth.uid()) = user_id)
-  with check ((select auth.uid()) = user_id);
 drop policy if exists "Users can delete own media jobs" on public.media_jobs;
 create policy "Users can delete own media jobs" on public.media_jobs
   for delete to authenticated using ((select auth.uid()) = user_id);
@@ -64,3 +60,29 @@ drop policy if exists "Users can delete own source media" on storage.objects;
 create policy "Users can delete own source media" on storage.objects
   for delete to authenticated
   using (bucket_id = 'source-media' and (storage.foldername(name))[1] = (select auth.uid())::text);
+
+-- Only the authenticated owner can transition their own pending upload to uploaded.
+-- Clients cannot directly modify arbitrary job state or transcript fields.
+create or replace function public.confirm_media_upload(p_job_id uuid)
+returns table (id uuid, status text)
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_user_id uuid := auth.uid();
+begin
+  if v_user_id is null then
+    raise exception 'Authentication required';
+  end if;
+  return query
+    update public.media_jobs as job
+    set status = 'uploaded', updated_at = now()
+    where job.id = p_job_id
+      and job.user_id = v_user_id
+      and job.status = 'awaiting_upload'
+    returning job.id, job.status;
+end;
+$$;
+revoke all on function public.confirm_media_upload(uuid) from public, anon;
+grant execute on function public.confirm_media_upload(uuid) to authenticated;
