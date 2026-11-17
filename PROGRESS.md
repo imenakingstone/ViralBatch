@@ -132,3 +132,6 @@ _Last updated: 2026-11-17_
 - Added authenticated saved-batch history at `/batches`; the page reads only the current user's rows through Supabase RLS and shows a setup/migration message if the table is unavailable.
 - Added weekly Dependabot updates for npm packages and GitHub Actions.
 - The UI now includes a sign-in link, a Save batch action, and a My batches route. All account/database actions remain unverified until a correct Supabase project is configured.
+
+- Hardened the live AI route: if an OpenAI key is configured, the route now refuses to run unless Supabase URL/publishable key are configured and the request has a verified signed-in user. Demo mode remains available without external credentials.
+- Durable rate limits, per-user credit metering, and abuse monitoring are still not implemented; keep the live AI key disabled until those are built and tested.
