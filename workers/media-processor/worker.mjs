@@ -1,4 +1,11 @@
 import { createClient } from "@supabase/supabase-js";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+
+const execFileAsync = promisify(execFile);
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -6,6 +13,7 @@ const pindoToken = process.env.PINDO_API_TOKEN;
 const provider = process.env.TRANSCRIPTION_PROVIDER || "pindo";
 const pollMs = Number(process.env.WORKER_POLL_MS || 5000);
 const maxBytes = Number(process.env.MAX_TRANSCRIPTION_BYTES || 100 * 1024 * 1024);
+const maxDurationSeconds = Number(process.env.MAX_MEDIA_DURATION_SECONDS || 7200);
 
 if (!supabaseUrl || !serviceRoleKey) {
   throw new Error("SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required.");
@@ -22,9 +30,34 @@ const supabase = createClient(supabaseUrl, serviceRoleKey, {
 });
 let stopping = false;
 
-async function transcribeWithPindo(buffer, filename, mimeType) {
+async function prepareAudio(sourceBytes, filename) {
+  const directory = await mkdtemp(join(tmpdir(), "viralbatch-"));
+  const inputPath = join(directory, filename.replace(/[^a-zA-Z0-9._-]/g, "_"));
+  const outputPath = join(directory, "normalized-audio.mp3");
+  try {
+    await writeFile(inputPath, sourceBytes);
+    const probe = await execFileAsync("ffprobe", [
+      "-v", "error", "-show_entries", "format=duration",
+      "-of", "default=noprint_wrappers=1:nokey=1", inputPath
+    ], { timeout: 30000, maxBuffer: 1024 * 1024 });
+    const duration = Number.parseFloat(probe.stdout.trim());
+    if (!Number.isFinite(duration) || duration <= 0) throw new Error("Could not determine media duration.");
+    if (duration > maxDurationSeconds) throw new Error("Media exceeds the " + (maxDurationSeconds / 3600) + "-hour processing limit.");
+    await execFileAsync("ffmpeg", [
+      "-nostdin", "-hide_banner", "-loglevel", "error", "-y",
+      "-i", inputPath, "-vn", "-ac", "1", "-ar", "16000",
+      "-b:a", "64k", "-f", "mp3", outputPath
+    ], { timeout: 10 * 60 * 1000, maxBuffer: 4 * 1024 * 1024 });
+    return { directory, outputPath, duration };
+  } catch (error) {
+    await rm(directory, { recursive: true, force: true });
+    throw error;
+  }
+}
+
+async function transcribeWithPindo(buffer, filename) {
   const form = new FormData();
-  form.append("audio", new Blob([buffer], { type: mimeType }), filename);
+  form.append("audio", new Blob([buffer], { type: "audio/mpeg" }), filename);
   const response = await fetch("https://api.pindo.io/ai/stt/rw", {
     method: "POST",
     headers: { Authorization: `Bearer ${pindoToken}` },
@@ -58,11 +91,19 @@ async function processOne() {
       throw new Error("Downloaded media is empty or exceeds the worker size limit.");
     }
 
-    const transcriptText = await transcribeWithPindo(bytes, job.original_filename, job.mime_type);
+    const prepared = await prepareAudio(bytes, job.original_filename);
+    let transcriptText;
+    try {
+      const audioBytes = await readFile(prepared.outputPath);
+      transcriptText = await transcribeWithPindo(audioBytes, "viralbatch-audio.mp3");
+    } finally {
+      await rm(prepared.directory, { recursive: true, force: true });
+    }
     const transcript = {
       text: transcriptText,
       language: "rw",
       provider: "pindo",
+      duration_seconds: prepared.duration,
       created_at: new Date().toISOString(),
       timestamped: false
     };
