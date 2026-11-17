@@ -308,3 +308,5 @@ Important remaining safety work: do not expose the AI generation endpoint with a
 
 - Added a saved-batch history page at `/batches`, protected by server-side Supabase Auth checks and backed by the per-user RLS policy.
 - Added Dependabot configuration for weekly npm and GitHub Actions dependency updates.
+
+- The live generation route now requires a verified Supabase user whenever a billable OpenAI key is present. Without an AI key, the route stays in clearly labeled demo mode. Durable rate limits, per-user usage metering, and abuse monitoring remain required before public launch.
