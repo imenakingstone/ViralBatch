@@ -293,3 +293,15 @@ Current dependency versions were checked against npm on 2026-11-17: Next.js 16.4
 
 ### Outstanding
 Authentication, Supabase client integration, save/load history, real usage metering, payments, transcription, audio/video upload, clipping, FFmpeg rendering, subtitles, background workers, social publishing, production deployment, and human QA remain future work. See `PROGRESS.md` for the current verified next actions.
+
+
+### Additional implementation — authentication and saved batches
+- Added current Supabase SSR browser/server clients using `@supabase/ssr` and `@supabase/supabase-js`.
+- Added a Next.js 16 root `proxy.ts` to refresh Supabase auth cookies using `auth.getClaims()`.
+- Added email/password sign-in and sign-up forms, server actions, and an email confirmation callback route.
+- Added a Save batch action in the content studio that checks the signed-in user and inserts the batch under that user's ID.
+- Added explicit environment variable names for the Supabase project URL and publishable key.
+- Supabase docs recommend cookie-based SSR clients, verifying claims on the server, and explicit grants plus RLS policies. The implementation follows this pattern, but it still needs a real project configuration and test run.
+- No existing Supabase project was selected or modified because the connected account's project list did not contain a project clearly identified as ViralBatch.
+
+Important remaining safety work: do not expose the AI generation endpoint with a billable key to public traffic until authentication is enforced on that endpoint and durable rate limits/usage metering are implemented. The current sign-in flow protects saved batch writes via RLS but does not yet gate the generation API.
