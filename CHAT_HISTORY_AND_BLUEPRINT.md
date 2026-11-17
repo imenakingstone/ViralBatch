@@ -352,3 +352,13 @@ Human-dependent setup that AI cannot safely infer: choose/create the correct ded
 - Added a Kinyarwanda ASR research note. Current candidates: Google Cloud Speech-to-Text V2 (`rw-RW`) and Pindo Voice AI (`rw`). Neither is selected or configured; test consented Rwandan recordings and privacy/pricing before production choice.
 - Added a WER/CER evaluation utility and instructions. Do not commit private audio or real reference transcripts to this public repository.
 - New docs: `docs/kinyarwanda-transcription-research.md`, `docs/asr-evaluation/README.md`, and `scripts/evaluate-asr.mjs`.
+
+
+## 2026-11-17 — AI completed more of the previously human-dependent setup
+- Inspected the connected Supabase account. Existing projects are MusicPlayer (inactive), glolex (inactive), and FREE-CROSSPOSTER (active). None is clearly ViralBatch, so no unrelated database was modified and no new billable project was created.
+- Built a fourth migration for the secure media queue, service-role-only worker RPCs, retries, and stale-worker recovery.
+- Built a separate Node 22 container worker that calls Pindo's authenticated Kinyarwanda speech-to-text API and saves plain transcripts to media jobs.
+- Connected the dashboard to list media jobs and display completed transcript text.
+- Added worker syntax validation to GitHub Actions and updated README/PROGRESS.
+- Human tasks still needed: create/identify the dedicated ViralBatch Supabase project, provide the project URL/publishable key and server-only service role key through secret settings, supply Pindo credentials, deploy the worker container, and approve provider privacy/consent terms. Do not paste private credentials into chat or commit them.
+- Current boundary: media transcription is architected and coded, but cannot run until the database migration and worker secrets/deployment exist. Transcripts are plain text without timestamps; no FFmpeg clip rendering or subtitle output yet.
