@@ -27,6 +27,18 @@ begin
     raise exception 'Service role required';
   end if;
 
+  -- A worker may disappear while holding its final lease. Do not leave that
+  -- job stuck in processing forever after the retry budget is exhausted.
+  update public.media_jobs
+  set status = 'failed',
+      last_error = coalesce(last_error, 'Worker lease expired after maximum attempts'),
+      error_message = coalesce(error_message, 'Worker lease expired after maximum attempts'),
+      locked_at = null,
+      updated_at = now()
+  where status = 'processing'
+    and locked_at < now() - interval '20 minutes'
+    and attempts >= 3;
+
   return query
   with candidate as (
     select job.id
