@@ -322,3 +322,25 @@ Important remaining safety work: do not expose the AI generation endpoint with a
 - Added a signed-in usage summary endpoint and a studio display for remaining daily live AI generations. The summary is returned by a separate read-only database function; clients cannot read the private usage ledger directly.
 
 - Added a secure saved-batch detail page at `/batches/[id]` with session checks, UUID validation, and an owner-scoped query. Users can open a saved batch and review its original script, hooks, platform captions, hashtags, language, tone, and timestamp.
+
+
+## 13. Current implementation correction — 2026-11-17
+
+This section and `PROGRESS.md` supersede earlier roadmap/status statements above wherever they conflict.
+
+Implemented after the initial blueprint:
+- Supabase SSR authentication, email/password flows, protected saved-batch history, detail, and deletion.
+- Live AI endpoint authentication and database-backed daily quota (30 generations/user/UTC day), plus usage summary API/UI.
+- Private media storage schema and signed-upload/job APIs:
+  - `POST /api/media/upload-url`
+  - `GET /api/media/jobs`
+  - `PATCH /api/media/jobs`
+- Third migration: `supabase/migrations/202611170003_media_pipeline.sql`.
+
+Important: the media upload backend is a foundation, not a finished media feature. Browser upload UI, transcription, FFmpeg processing, and rendered clips are still outstanding.
+
+Connected Supabase projects were rechecked: `MusicPlayer` and `glolex` are inactive; `FREE-CROSSPOSTER` is active. None is clearly identified as ViralBatch. Do not apply ViralBatch migrations to FREE-CROSSPOSTER without explicit user confirmation.
+
+CI review found TypeScript typecheck passed, while lint initially failed on JSX apostrophe escaping and internal anchor navigation. Those issues were fixed in subsequent commits; check the newest workflow run before marking CI green. An npm install audit also reported 14 high-severity findings; review them deliberately rather than applying a potentially breaking forced audit fix.
+
+Human-dependent setup that AI cannot safely infer: choose/create the correct dedicated Supabase project, provide its credentials and the OpenAI secret through secure settings, review/apply migrations, and approve any paid deployment or public launch.
