@@ -20,3 +20,18 @@
 .batch-delete:hover{border-color:#ef7777;color:#ff9b9b}
 .batch-item{gap:16px}
 @media(max-width:560px){.batch-controls{align-items:flex-end;flex-direction:column;gap:7px}.batch-item{align-items:flex-start}}
+
+
+/* Saved batch detail */
+.batch-item .batch-copy h2 a{color:inherit;text-decoration:none}
+.batch-item .batch-copy h2 a:hover{color:#a9a0ff}
+.batch-detail{max-width:900px}
+.batch-detail .history-intro{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.detail-section{margin-top:24px;padding:22px;border:1px solid rgba(255,255,255,.09);border-radius:14px;background:rgba(255,255,255,.025)}
+.detail-section h2{margin:0 0 14px;font-size:17px}
+.detail-script,.detail-caption p{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.7;color:#c7cbd5}
+.detail-hooks{padding-left:22px;color:#d7d9e1}
+.detail-hooks li{padding:8px 0;line-height:1.6}
+.detail-caption{padding:14px 0;border-top:1px solid rgba(255,255,255,.08)}
+.detail-caption h3{margin:0 0 8px;font-size:13px;color:#aaa2ff}
+.detail-caption p{margin:0}
