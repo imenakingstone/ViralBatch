@@ -120,3 +120,7 @@ _Last updated: 2026-11-17_
 - No secrets were added to the repository.
 - No paid resources were created, no deployment was triggered, and no database was modified.
 - Preview mode is for interface testing only; it does not replace a configured AI provider.
+
+- Supabase account inspection found three existing projects, none named ViralBatch. No database migration was applied because the correct target project is not confirmed; do not use an unrelated existing project.
+- Current stable package versions were checked on npm: Next.js 16.4.6 and React 19.3.1. Official Next.js installation guidance recommends the App Router and TypeScript foundation. Supabase RLS guidance informed the explicit authenticated-role grants, per-user policies, and indexed ownership column.
+- The live generation endpoint currently has no authentication or durable rate limiting. Do not deploy it with a paid AI key until authentication, abuse controls, and usage limits are implemented.
