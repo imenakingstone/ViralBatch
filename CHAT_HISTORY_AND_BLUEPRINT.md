@@ -344,3 +344,11 @@ Connected Supabase projects were rechecked: `MusicPlayer` and `glolex` are inact
 CI review found TypeScript typecheck passed, while lint initially failed on JSX apostrophe escaping and internal anchor navigation. Those issues were fixed in subsequent commits; check the newest workflow run before marking CI green. An npm install audit also reported 14 high-severity findings; review them deliberately rather than applying a potentially breaking forced audit fix.
 
 Human-dependent setup that AI cannot safely infer: choose/create the correct dedicated Supabase project, provide its credentials and the OpenAI secret through secure settings, review/apply migrations, and approve any paid deployment or public launch.
+
+
+## 14. Media upload and Kinyarwanda ASR additions — 2026-11-17
+- The studio now includes a source audio/video upload panel. It requests a short-lived signed upload token, uploads directly to the private `source-media` bucket, and confirms the object.
+- Media job writes are hardened: authenticated users can create only the allowed metadata fields; job state transitions use an owner-checked database function rather than broad client update permissions.
+- Added a Kinyarwanda ASR research note. Current candidates: Google Cloud Speech-to-Text V2 (`rw-RW`) and Pindo Voice AI (`rw`). Neither is selected or configured; test consented Rwandan recordings and privacy/pricing before production choice.
+- Added a WER/CER evaluation utility and instructions. Do not commit private audio or real reference transcripts to this public repository.
+- New docs: `docs/kinyarwanda-transcription-research.md`, `docs/asr-evaluation/README.md`, and `scripts/evaluate-asr.mjs`.
