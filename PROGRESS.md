@@ -92,3 +92,5 @@ Default branch: `main`
 - All changes are committed on `main`. They are code-level implementations only; no migrations or tests have been run against a live Supabase project.
 
 - Added authenticated `GET /api/usage` and a studio usage display showing remaining daily live generations and UTC reset time for signed-in users. Added a read-only security-definer RPC; the usage ledger remains inaccessible directly to client roles.
+
+- Added a secure saved-batch detail route at `/batches/[id]` that verifies the session, validates the UUID, and queries only the current user's batch. The history list now links to details; saved content displays the original script, hooks, captions, hashtags, language, tone, and creation time.
