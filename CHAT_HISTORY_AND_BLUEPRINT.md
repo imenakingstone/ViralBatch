@@ -362,3 +362,12 @@ Human-dependent setup that AI cannot safely infer: choose/create the correct ded
 - Added worker syntax validation to GitHub Actions and updated README/PROGRESS.
 - Human tasks still needed: create/identify the dedicated ViralBatch Supabase project, provide the project URL/publishable key and server-only service role key through secret settings, supply Pindo credentials, deploy the worker container, and approve provider privacy/consent terms. Do not paste private credentials into chat or commit them.
 - Current boundary: media transcription is architected and coded, but cannot run until the database migration and worker secrets/deployment exist. Transcripts are plain text without timestamps; no FFmpeg clip rendering or subtitle output yet.
+
+## 2026-11-17 — Role-based access and API auto-detection
+- Added a fifth SQL migration for Admin/Creator/Agency roles, a user integration registry, role-change RPC restricted to existing admins, and narrowed profile update grants to prevent self-promotion.
+- Added a server-only provider capability catalog for OpenAI, Pindo, TikTok, Instagram, and YouTube; API responses expose provider status/capabilities, never secret values.
+- Added authenticated integration status endpoint and /integrations control-center page.
+- Added admin-only role assignment endpoint; database-level admin check remains authoritative.
+- Added the first-admin bootstrap SQL to README. The owner must execute it once in the confirmed ViralBatch Supabase project after reviewing/applying the fifth migration.
+- Social provider client credentials do not equal a connected social account. OAuth account authorization, scopes, token refresh, and publishing workflows remain future implementation.
+- All code is committed to main; no migrations applied and no real API keys configured. CI still needs checking.
