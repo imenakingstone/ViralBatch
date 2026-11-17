@@ -9,6 +9,7 @@ const messages: Record<string, string> = {
   credentials: "Those sign-in details were not accepted. Check them and try again.",
   signup: "We could not create your account. The email may already be registered.",
   setup: "Account services are not configured yet. Add your Supabase project URL and publishable key.",
+  confirmation: "The confirmation link is invalid or expired. Request a new sign-up email and try again.",
 };
 
 export default async function LoginPage({ searchParams }: Props) {
