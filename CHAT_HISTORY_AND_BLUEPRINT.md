@@ -320,3 +320,5 @@ Important remaining safety work: do not expose the AI generation endpoint with a
 - These database-backed features still require the correct Supabase project to be confirmed and both migrations to be applied. They have not been live-tested.
 
 - Added a signed-in usage summary endpoint and a studio display for remaining daily live AI generations. The summary is returned by a separate read-only database function; clients cannot read the private usage ledger directly.
+
+- Added a secure saved-batch detail page at `/batches/[id]` with session checks, UUID validation, and an owner-scoped query. Users can open a saved batch and review its original script, hooks, platform captions, hashtags, language, tone, and timestamp.
