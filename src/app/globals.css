@@ -67,3 +67,26 @@
 .media-transcript p,.media-job-error{white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;line-height:1.65;color:#d2d5df}
 .media-job-error{color:#ff9c9c}
 @media(max-width:600px){.media-job-meta{align-items:flex-start;flex-direction:column;gap:8px}}
+
+/* Role-aware integration center */
+.integration-page{min-height:100vh;background:var(--bg);color:var(--ink)}
+.integration-content{max-width:1100px;margin:0 auto;padding:48px 28px}
+.integration-content h1{font:800 clamp(28px,4vw,40px) Manrope;letter-spacing:-1.5px;margin:12px 0 7px}
+.integration-intro{color:var(--muted);font-size:13px;line-height:1.6;max-width:650px}
+.role-banner{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:17px 20px;margin:26px 0 18px;background:#fff;border:1px solid var(--line);border-radius:13px}
+.role-banner>div{display:grid;gap:5px}.role-banner b{font-size:13px}.role-banner small{font-size:11px;color:var(--muted)}
+.role-banner>span{font-size:9px;font-weight:800;letter-spacing:1px;padding:7px 10px;border-radius:7px;background:var(--lav);color:var(--purple)}
+.integration-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+.integration-card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px}
+.integration-card-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.integration-symbol{width:38px;height:38px;display:grid;place-items:center;border-radius:11px;background:var(--lav);color:var(--purple)}
+.integration-state{display:flex;align-items:center;gap:5px;font-size:8px;font-weight:800;letter-spacing:.7px;color:#9a9dad}
+.integration-state.ready{color:var(--green)}
+.integration-card h2{font:800 17px Manrope;margin:15px 0 5px}
+.integration-card>p{font-size:11px;color:var(--muted);line-height:1.6;min-height:35px}
+.capability-list{display:grid;gap:7px;margin-top:16px;padding-top:13px;border-top:1px solid var(--line)}
+.capability-list>b{font-size:8px;letter-spacing:1px;color:#9a9dad}
+.capability-list>span{font-size:10px;color:#5c6072;font-family:monospace}
+.integration-admin-note{margin-top:14px;padding:10px;border-radius:8px;background:#f8f7fc;color:#777b8d;font-size:10px;line-height:1.6;overflow-wrap:anywhere}
+.integration-footnote{margin-top:20px;font-size:10px;line-height:1.7;color:#9296a5}
+@media(max-width:650px){.integration-content{padding:30px 17px}.integration-grid{grid-template-columns:1fr}.role-banner{align-items:flex-start;flex-direction:column}}
