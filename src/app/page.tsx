@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { createClient as createSupabaseClient } from "@/lib/supabase/client";
 import { AudioLines, ArrowDownToLine, ArrowRight, BadgeCheck, Check, ChevronDown, Clapperboard, Copy, FileText, Instagram, Languages, Menu, Play, Sparkles, WandSparkles, Youtube, Zap } from "lucide-react";
 
@@ -10,6 +12,7 @@ const platforms: Platform[] = ["TikTok", "Instagram Reels", "YouTube Shorts"];
 const starter = "Most creators don't need more ideas. They need a simple system to turn one good idea into a week of content. Start with one useful story, find the strongest moment, and share it in a way that feels natural on every platform.";
 
 export default function Home() {
+  const router = useRouter();
   const [script, setScript] = useState(starter);
   const [language, setLanguage] = useState("English");
   const [tone, setTone] = useState("Engaging");
@@ -53,9 +56,9 @@ export default function Home() {
     if (!batch) return;
     setSaveStatus("Saving...");
     const supabase = createSupabaseClient();
-    if (!supabase) { window.location.href = "/login?error=setup"; return; }
+    if (!supabase) { router.push("/login?error=setup"); return; }
     const { data: { user }, error: authError } = await supabase.auth.getUser();
-    if (authError || !user) { window.location.href = "/login"; return; }
+    if (authError || !user) { router.push("/login"); return; }
     const { error: saveError } = await supabase.from("batches").insert({
       user_id: user.id,
       title: script.trim().slice(0, 80) || "Untitled batch",
@@ -80,14 +83,14 @@ export default function Home() {
 
   return <main className="shell">
     <aside className={menuOpen ? "sidebar sidebar-open" : "sidebar"}>
-      <a className="brand" href="#"><span className="brand-icon"><AudioLines size={21}/></span><span>viral<span>batch</span><sup>AI</sup></span></a>
+      <Link className="brand" href="/"><span className="brand-icon"><AudioLines size={21}/></span><span>viral<span>batch</span><sup>AI</sup></span></Link>
       <div className="workspace"><div className="workspace-avatar">V</div><div><b>Creator workspace</b><small>Preview workspace</small></div><ChevronDown size={15}/></div>
       <p className="nav-label">WORKSPACE</p>
       <nav><a className="nav-link selected" href="#studio"><WandSparkles size={17}/> Content studio <i/></a><a className="nav-link" href="/batches"><FileText size={17}/> My batches</a><a className="nav-link muted" href="#roadmap"><Clapperboard size={17}/> Video tools <span>SOON</span></a></nav>
       <div className="sidebar-bottom"><div className="plan-card"><div className="plan-icon"><Zap size={16}/></div><b>Your creative runway</b><p>{usage ? `You have ${usage.remaining} of ${usage.dailyLimit} live generations left today.` : "Explore the studio in preview mode. Sign in and connect the AI service to use live generation."}</p><div className="plan-line"><i/></div><small>{usage ? `${usage.used} used today · Resets at 00:00 UTC` : "Daily usage appears here after account setup."}</small></div><div className="user-row"><div className="user-avatar">VK</div><div><b>My workspace</b><small>Preview account</small></div><ChevronDown size={15}/></div></div>
     </aside>
     <section className="main">
-      <header className="topbar"><button className="mobile-menu" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle navigation"><Menu size={20}/></button><div className="crumb">Workspace <span>/</span> <b>Content studio</b></div><div className="top-right"><a className="signin-link" href="/login">Sign in</a><span className="status"><i/> STUDIO READY</span><div className="user-avatar">VK</div></div></header>
+      <header className="topbar"><button className="mobile-menu" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle navigation"><Menu size={20}/></button><div className="crumb">Workspace <span>/</span> <b>Content studio</b></div><div className="top-right"><Link className="signin-link" href="/login">Sign in</Link><span className="status"><i/> STUDIO READY</span><div className="user-avatar">VK</div></div></header>
       <div className="content" id="studio">
         <section className="hero"><div><div className="eyebrow"><Sparkles size={14}/> YOUR CONTENT, MULTIPLIED</div><h1>Make one idea go <em>further.</em></h1><p>Turn a script into a week of content, without the busywork.</p></div><div className="hero-stamp"><div><AudioLines size={25}/></div><span>CREATE ONCE<br/><b>SHARE EVERYWHERE</b></span></div></section>
         <div className="studio-grid">
