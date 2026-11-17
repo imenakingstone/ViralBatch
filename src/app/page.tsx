@@ -17,6 +17,9 @@ export default function Home() {
   const [script, setScript] = useState(starter);
   const [language, setLanguage] = useState("English");
   const [tone, setTone] = useState("Engaging");
+  const [contentGoal, setContentGoal] = useState("Grow audience");
+  const [targetAudience, setTargetAudience] = useState("");
+  const [brandVoice, setBrandVoice] = useState("");
   const [count, setCount] = useState("5");
   const [active, setActive] = useState<Platform>("TikTok");
   const [batch, setBatch] = useState<Batch | null>(null);
@@ -78,7 +81,7 @@ export default function Home() {
     if (script.trim().length < 20) { setError("Add at least 20 characters so ViralBatch has enough context."); return; }
     setLoading(true); setError("");
     try {
-      const response = await fetch("/api/generate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ script, language, tone, count: Number(count) }) });
+      const response = await fetch("/api/generate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ script, language, tone, contentGoal, targetAudience, brandVoice, count: Number(count) }) });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Generation failed.");
       setBatch(data as Batch);
@@ -104,6 +107,9 @@ export default function Home() {
       language,
       original_script: script,
       tone,
+      content_goal: contentGoal,
+      target_audience: targetAudience.trim(),
+      brand_voice: brandVoice.trim(),
       hooks: batch.hooks,
       captions: batch.captions,
       hashtags: batch.hashtags,
@@ -138,10 +144,13 @@ export default function Home() {
             <label className="field-label" htmlFor="script">YOUR SCRIPT</label>
             <textarea id="script" className="script-input" value={script} onChange={e => setScript(e.target.value)} maxLength={12000} placeholder="Paste your video script or transcript here..."/>
             <div className="textarea-meta"><span>{words} words · {script.length.toLocaleString()} / 12,000 characters</span><button onClick={() => setScript("")}>Clear text</button></div>
-            <div className="settings">
+            <div className="settings creator-context">
               <div><label className="field-label" htmlFor="language">OUTPUT LANGUAGE</label><div className="select-box"><Languages size={16}/><select id="language" value={language} onChange={e => setLanguage(e.target.value)}><option>English</option><option>Kinyarwanda</option><option>Mixed (Kinyarwanda + English)</option><option>French</option></select><ChevronDown size={14}/></div></div>
               <div><label className="field-label" htmlFor="tone">CONTENT STYLE</label><div className="select-box"><Sparkles size={16}/><select id="tone" value={tone} onChange={e => setTone(e.target.value)}>{["Engaging","Educational","Storytelling","Bold & punchy","Professional","Funny"].map(v => <option key={v}>{v}</option>)}</select><ChevronDown size={14}/></div></div>
               <div><label className="field-label" htmlFor="count">HOOK VARIATIONS</label><div className="select-box"><Zap size={16}/><select id="count" value={count} onChange={e => setCount(e.target.value)}>{["3","5","8","10"].map(v => <option key={v}>{v}</option>)}</select><ChevronDown size={14}/></div></div>
+              <div><label className="field-label" htmlFor="content-goal">CONTENT GOAL</label><div className="select-box"><Sparkles size={16}/><select id="content-goal" value={contentGoal} onChange={e => setContentGoal(e.target.value)}><option>Grow audience</option><option>Educate audience</option><option>Build community</option><option>Drive sales</option><option>Increase engagement</option></select><ChevronDown size={14}/></div></div>
+              <div className="context-field"><label className="field-label" htmlFor="target-audience">WHO IS THIS FOR? <span>OPTIONAL</span></label><input id="target-audience" value={targetAudience} onChange={e => setTargetAudience(e.target.value.slice(0,120))} maxLength={120} placeholder="e.g. Rwandan entrepreneurs, students..." /></div>
+              <div className="context-field"><label className="field-label" htmlFor="brand-voice">YOUR BRAND VOICE <span>OPTIONAL</span></label><input id="brand-voice" value={brandVoice} onChange={e => setBrandVoice(e.target.value.slice(0,280))} maxLength={280} placeholder="e.g. Warm, witty, direct, uses Kinyarwanda..." /></div>
             </div>
             {error && <p className="error" role="alert">{error}</p>}
             <button className="generate" onClick={generate} disabled={loading}><WandSparkles size={18}/>{loading ? "Creating your batch..." : "Generate content batch"}<ArrowRight size={17}/></button>
