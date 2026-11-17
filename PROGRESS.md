@@ -122,3 +122,13 @@ There is no project clearly named ViralBatch. The FREE-CROSSPOSTER project must 
 - Existing connected Supabase projects are MusicPlayer, glolex, and FREE-CROSSPOSTER; none is confirmed as ViralBatch. Do not apply these migrations to another app's database.
 
 - Improved the worker to use FFmpeg/ffprobe for duration validation and normalize uploaded audio/video to mono 16 kHz MP3 before Pindo transcription. Default limits: 100 MiB source file and 2 hours duration.
+
+## Role-based access and automatic API capabilities — 2026-11-17
+- Added migration 5: profile roles (admin, creator, agency), owner-scoped integration registry, protected admin role-assignment RPC, and narrowed profile update grants so members cannot promote themselves.
+- Added a server-side integration catalog for OpenAI, Pindo, TikTok, Instagram, and YouTube. It detects required environment variables without exposing secret values.
+- Added authenticated GET /api/integrations returning role, configured providers, and enabled capability identifiers.
+- Added admin-protected PATCH /api/admin/members/role; the database RPC independently verifies the caller is already an admin.
+- Added /integrations status page and workspace navigation link.
+- Human bootstrap still required: after the dedicated ViralBatch database is confirmed and migration 5 is reviewed/applied, the project owner must assign the first admin with the documented one-time SQL. Provider secrets must be configured in server-side secret settings.
+- Important limitation: social platform entries currently detect app credentials only. OAuth login, creator-account consent, token refresh/storage, publishing scopes, and app review are not yet implemented. No platform publishing is falsely marked as fully connected.
+- No database migrations or live API connections were executed; the dedicated ViralBatch Supabase project and provider secrets remain unconfigured.
