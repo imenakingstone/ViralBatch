@@ -76,3 +76,22 @@ Provider documentation:
 - Kinyarwanda support in Google Cloud Speech-to-Text is also documented: https://cloud.google.com/speech-to-text/docs/speech-to-text-supported-languages
 
 Before sending user media to any provider, obtain consent and review provider retention/privacy terms. Kinyarwanda quality still requires a consented Rwandan evaluation set and fluent-speaker review.
+
+## Roles and automatic API capability detection
+
+The fifth migration adds the admin, creator, and agency profile roles and an owner-scoped integration registry. The /integrations page checks server-side environment configuration and reports which capabilities are ready. GET /api/integrations returns the signed-in member's role and enabled capability identifiers. The admin-only role assignment RPC is exposed through PATCH /api/admin/members/role and cannot be used by creators or agencies.
+
+**First administrator bootstrap:** after confirming the correct ViralBatch Supabase project and applying migration 5, sign in with the account that should own the workspace, then run this one-time SQL in that project's SQL Editor, replacing the email with the exact account email:
+```sql
+update public.profiles
+set role = 'admin', updated_at = now()
+where id = (select id from auth.users where lower(email) = lower('YOUR_ADMIN_EMAIL'));
+```
+Do not run this on another app's Supabase project. The first admin must be assigned by the project owner; thereafter admins can assign member roles through the protected RPC.
+
+Add provider credentials as server-only environment secrets in the deployment/Codespaces environment. Current registry checks:
+- OPENAI_API_KEY enables the content-generation capability.
+- PINDO_API_TOKEN enables the Kinyarwanda transcription capability.
+- TikTok, Instagram, and YouTube client credentials mark OAuth setup as configured, but publishing is **not** activated until their OAuth authorization, callback, token storage/refresh, scopes, and platform app reviews are implemented. Do not treat client credentials alone as a connected creator account.
+
+The current integration status is configuration detection, not a secret-entry form. Keys are never returned by the API. A configured provider can still fail at runtime if its key is invalid, expired, out of quota, or lacks provider permissions.
