@@ -131,7 +131,7 @@ export default function Home() {
           </div>}
           {saveStatus && <p className="save-status" role="status">{saveStatus}</p>}
         </section>
-        <footer className="footer"><a className="brand" href="#"><span className="brand-icon"><AudioLines size={17}/></span><span>viral<span>batch</span><sup>AI</sup></span></a><span>Made for the people making things happen.</span><span>© 2026 ViralBatch</span></footer>
+        <footer className="footer"><Link className="brand" href="/"><span className="brand-icon"><AudioLines size={17}/></span><span>viral<span>batch</span><sup>AI</sup></span></Link><span>Made for the people making things happen.</span><span>© 2026 ViralBatch</span></footer>
       </div>
     </section>
   </main>;
