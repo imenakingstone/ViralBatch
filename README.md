@@ -42,7 +42,7 @@ Restart the development server after changing environment variables. Never add a
 1. Confirm the intended Supabase project.
 2. Review supabase/migrations/202611170001_initial_schema.sql.
 3. Apply it in the Supabase SQL Editor only after confirming the project and reviewing the SQL.
-4. Configure Supabase URL and anon key when authentication is implemented.
+4. Add `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` to your environment. The sign-in/sign-up UI and cookie-based SSR clients are implemented; authentication will work only after valid project settings and the migration are in place.
 
 The migration creates profiles and batches, enables RLS, and scopes rows to the signed-in user. It has not been applied to any database by this repository change.
 
@@ -54,7 +54,7 @@ The migration creates profiles and batches, enables RLS, and scopes rows to the 
 - CHAT_HISTORY_AND_BLUEPRINT.md — conversation history and product blueprint.
 
 ## Not implemented yet
-Authentication UI/session handling, saving batches to Supabase, subscription/credit enforcement, Kinyarwanda transcription, audio/video upload, clip selection, FFmpeg rendering, subtitles, background jobs, publishing integrations, and production deployment.
+Subscription/credit enforcement, Kinyarwanda transcription, audio/video upload, clip selection, FFmpeg rendering, subtitles, background jobs, publishing integrations, and production deployment.
 
 ## Important
 This project is not production-ready until dependencies are installed, type/lint/build checks pass, auth and RLS are tested, secrets are configured securely, and real Kinyarwanda outputs are reviewed by fluent speakers. Provider pricing, availability, and model support can change; verify before launch.
