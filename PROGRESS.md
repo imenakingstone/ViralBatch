@@ -90,3 +90,5 @@ Default branch: `main`
 - Rewrote this progress tracker to remove stale statements that contradicted the implemented code.
 - Updated README with the second migration and daily quota behavior.
 - All changes are committed on `main`. They are code-level implementations only; no migrations or tests have been run against a live Supabase project.
+
+- Added authenticated `GET /api/usage` and a studio usage display showing remaining daily live generations and UTC reset time for signed-in users. Added a read-only security-definer RPC; the usage ledger remains inaccessible directly to client roles.
