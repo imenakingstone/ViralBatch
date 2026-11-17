@@ -46,3 +46,28 @@ $$;
 
 revoke all on function public.consume_generation_credit() from public, anon;
 grant execute on function public.consume_generation_credit() to authenticated;
+
+-- Read-only usage summary for the signed-in user.
+create or replace function public.get_generation_usage()
+returns table (used integer, remaining integer, daily_limit integer)
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  v_user_id uuid := auth.uid();
+  v_used integer;
+  v_limit constant integer := 30;
+  v_day_start timestamptz := date_trunc('day', now() at time zone 'utc') at time zone 'utc';
+begin
+  if v_user_id is null then
+    raise exception 'Authentication required';
+  end if;
+  select count(*)::integer into v_used
+  from public.generation_usage
+  where user_id = v_user_id and created_at >= v_day_start;
+  return query select v_used, greatest(v_limit - v_used, 0), v_limit;
+end;
+$$;
+revoke all on function public.get_generation_usage() from public, anon;
+grant execute on function public.get_generation_usage() to authenticated;
