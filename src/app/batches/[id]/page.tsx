@@ -10,6 +10,9 @@ type SavedBatch = {
   title: string;
   language: string;
   tone: string;
+  content_goal: string;
+  target_audience: string;
+  brand_voice: string;
   generation_mode: string;
   original_script: string;
   hooks: string[];
@@ -31,7 +34,7 @@ export default async function BatchDetailPage({ params }: { params: Promise<{ id
 
   const { data, error } = await supabase
     .from("batches")
-    .select("id,title,language,tone,generation_mode,original_script,hooks,captions,hashtags,created_at")
+    .select("id,title,language,tone,content_goal,target_audience,brand_voice,generation_mode,original_script,hooks,captions,hashtags,created_at")
     .eq("id", id)
     .eq("user_id", user.id)
     .maybeSingle();
@@ -48,6 +51,7 @@ export default async function BatchDetailPage({ params }: { params: Promise<{ id
       <div className="eyebrow"><FileText size={14}/> SAVED CONTENT BATCH</div>
       <h1>{batch.title}</h1>
       <p className="history-intro"><CalendarDays size={14}/> {new Date(batch.created_at).toLocaleString()} · {batch.language} · {batch.tone} · {batch.generation_mode === "ai" ? "AI generated" : "Preview mode"}</p>
+      <article className="detail-section"><h2>Creator brief</h2><p><strong>Goal:</strong> {batch.content_goal || "Grow audience"}</p>{batch.target_audience && <p><strong>Audience:</strong> {batch.target_audience}</p>}{batch.brand_voice && <p><strong>Brand voice:</strong> {batch.brand_voice}</p>}</article>
       <article className="detail-section"><h2>Original script</h2><p className="detail-script">{batch.original_script}</p></article>
       <article className="detail-section"><h2>Hook ideas</h2><ol className="detail-hooks">{(batch.hooks || []).map((hook, index) => <li key={index}>{hook}</li>)}</ol></article>
       <article className="detail-section"><h2>Platform captions</h2>{Object.entries(batch.captions || {}).map(([platform, caption]) => <div className="detail-caption" key={platform}><h3>{platform}</h3><p>{caption}</p></div>)}</article>
