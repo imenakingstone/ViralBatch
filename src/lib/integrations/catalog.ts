@@ -30,3 +30,14 @@ export function getIntegrationStatus() {
     };
   });
 }
+
+export type WorkspaceRole = "admin" | "creator" | "agency";
+export const roleCapabilities: Record<WorkspaceRole, string[]> = {
+  admin: ["content.generate", "media.upload", "media.transcribe.rw", "integrations.manage", "members.manage", "workspace.manage"],
+  creator: ["content.generate", "media.upload", "media.transcribe.rw"],
+  agency: ["content.generate", "media.upload", "media.transcribe.rw", "brands.manage", "team.manage", "client.reports"]
+};
+
+export function getRoleCapabilities(role: string) {
+  return roleCapabilities[(role in roleCapabilities ? role : "creator") as WorkspaceRole];
+}
