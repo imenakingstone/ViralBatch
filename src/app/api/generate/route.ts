@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
@@ -45,6 +46,18 @@ export async function POST(request: Request) {
 
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) return NextResponse.json(demoOutput(script, language, count));
+
+  // Never expose a billable AI endpoint without verified Supabase authentication.
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) {
+    return NextResponse.json({ error: "Live AI generation is disabled until Supabase authentication is configured." }, { status: 503 });
+  }
+  try {
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) return NextResponse.json({ error: "Sign in to use live AI generation." }, { status: 401 });
+  } catch {
+    return NextResponse.json({ error: "Authentication could not be verified. Please sign in again." }, { status: 401 });
+  }
 
   try {
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
