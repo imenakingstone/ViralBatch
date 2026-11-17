@@ -59,6 +59,25 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Authentication could not be verified. Please sign in again." }, { status: 401 });
   }
 
+  // Atomically consume a daily generation credit before spending provider tokens.
+  // The database function serializes concurrent requests for this user.
+  try {
+    const { data: quotaRows, error: quotaError } = await (await createClient()).rpc("consume_generation_credit");
+    if (quotaError) {
+      console.error("Generation quota check failed:", quotaError.message);
+      return NextResponse.json({ error: "Usage limits are not ready yet. Apply the latest ViralBatch database migrations and try again." }, { status: 503 });
+    }
+    const quota = Array.isArray(quotaRows) ? quotaRows[0] : quotaRows;
+    if (!quota || !quota.allowed) {
+      return NextResponse.json({
+        error: "You've reached today's live AI generation limit. Please try again tomorrow.",
+        usage: quota ? { remaining: quota.remaining, dailyLimit: quota.daily_limit } : undefined
+      }, { status: 429 });
+    }
+  } catch {
+    return NextResponse.json({ error: "Your usage allowance could not be verified. Please try again." }, { status: 503 });
+  }
+
   try {
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
