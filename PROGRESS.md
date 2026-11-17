@@ -81,3 +81,12 @@ Default branch: `main`
 - Never mark a feature tested unless an actual test ran.
 - Never commit secrets.
 - Keep this file updated after meaningful work sessions.
+
+## Continued AI build session — 2026-11-17 evening
+
+- Added migration `202611170002_generation_usage.sql`: private generation usage ledger plus an atomic PostgreSQL function that allows up to 30 live AI generations per signed-in user per UTC day. The function serializes concurrent requests per user/day and fails closed if auth is absent.
+- Updated `POST /api/generate` to consume a quota credit before calling the paid AI provider and return clear 429/503 responses when the limit is reached or quota infrastructure is unavailable.
+- Added authenticated saved-batch deletion using a server action; the action checks the signed-in user and scopes deletion to that user's own row. Added responsive button styling.
+- Rewrote this progress tracker to remove stale statements that contradicted the implemented code.
+- Updated README with the second migration and daily quota behavior.
+- All changes are committed on `main`. They are code-level implementations only; no migrations or tests have been run against a live Supabase project.
