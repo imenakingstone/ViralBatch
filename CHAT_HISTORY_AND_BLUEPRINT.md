@@ -371,3 +371,12 @@ Human-dependent setup that AI cannot safely infer: choose/create the correct ded
 - Added the first-admin bootstrap SQL to README. The owner must execute it once in the confirmed ViralBatch Supabase project after reviewing/applying the fifth migration.
 - Social provider client credentials do not equal a connected social account. OAuth account authorization, scopes, token refresh, and publishing workflows remain future implementation.
 - All code is committed to main; no migrations applied and no real API keys configured. CI still needs checking.
+
+
+## 2026-11-17 — ViralBatch visual design refresh
+- Researched current creator-tool and SaaS patterns and selected a warm, premium creator-workspace direction rather than a generic purple AI dashboard.
+- Light palette: warm off-white `#F5F3EE`, white surfaces, forest-charcoal `#1E2D2B`, muted `#687773`, emerald action `#16845F`, mint surface `#E6F4EC`.
+- Dark palette: `#101714` canvas, `#18221D` surfaces, soft white text and matching emerald accents. It follows the user's OS theme preference.
+- Updated global CSS across studio, auth, history, batch details, media and integrations. Existing feature logic and navigation were preserved.
+- Added `docs/design-system.md` to keep future implementation consistent.
+- Outstanding verification: inspect the running app at desktop/mobile sizes and confirm the new GitHub Actions run passes. The CSS has not been browser-rendered by the assistant.
