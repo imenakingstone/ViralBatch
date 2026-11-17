@@ -120,3 +120,5 @@ There is no project clearly named ViralBatch. The FREE-CROSSPOSTER project must 
 - The worker default limit is 100 MiB although private source storage allows 512 MiB. Large-file streaming/chunking and provider limits need later work.
 - Provider privacy/retention and consent flow need review before sending customer media to Pindo.
 - Existing connected Supabase projects are MusicPlayer, glolex, and FREE-CROSSPOSTER; none is confirmed as ViralBatch. Do not apply these migrations to another app's database.
+
+- Improved the worker to use FFmpeg/ffprobe for duration validation and normalize uploaded audio/video to mono 16 kHz MP3 before Pindo transcription. Default limits: 100 MiB source file and 2 hours duration.
