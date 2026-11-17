@@ -66,16 +66,11 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: "The uploaded file could not be found. Finish uploading before confirming." }, { status: 409 });
   }
 
-  const { data: updated, error: updateError } = await auth.supabase
-    .from("media_jobs")
-    .update({ status: "uploaded", updated_at: new Date().toISOString() })
-    .eq("id", jobId)
-    .eq("user_id", auth.user.id)
-    .eq("status", "awaiting_upload")
-    .select("id,status")
-    .maybeSingle();
+  const { data: confirmed, error: confirmError } = await auth.supabase
+    .rpc("confirm_media_upload", { p_job_id: jobId });
 
-  if (updateError || !updated) {
+  const updated = Array.isArray(confirmed) ? confirmed[0] : confirmed;
+  if (confirmError || !updated) {
     return NextResponse.json({ error: "Could not confirm this upload." }, { status: 409 });
   }
   return NextResponse.json({ job: updated });
