@@ -3,8 +3,8 @@ import { readFile } from "node:fs/promises";
 
 function normalize(text) {
   return text.normalize("NFKC").toLocaleLowerCase("und")
-    .replace(/[\\p{P}\\p{S}]/gu, " ")
-    .replace(/\\s+/gu, " ")
+    .replace(/[\p{P}\p{S}]/gu, " ")
+    .replace(/\s+/gu, " ")
     .trim();
 }
 
