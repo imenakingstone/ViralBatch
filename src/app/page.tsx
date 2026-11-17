@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { createClient as createSupabaseClient } from "@/lib/supabase/client";
 import { AudioLines, ArrowDownToLine, ArrowRight, BadgeCheck, Check, ChevronDown, Clapperboard, Copy, FileText, Instagram, Languages, Menu, Play, Sparkles, WandSparkles, Youtube, Zap } from "lucide-react";
 
 type Platform = "TikTok" | "Instagram Reels" | "YouTube Shorts";
@@ -18,6 +19,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [copied, setCopied] = useState("");
+  const [saveStatus, setSaveStatus] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const words = useMemo(() => script.trim() ? script.trim().split(/\s+/).length : 0, [script]);
 
@@ -38,6 +40,27 @@ export default function Home() {
     catch { setError("Clipboard access was blocked. Select the text and copy it manually."); }
   }
 
+  async function saveBatch() {
+    if (!batch) return;
+    setSaveStatus("Saving...");
+    const supabase = createSupabaseClient();
+    if (!supabase) { window.location.href = "/login?error=setup"; return; }
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) { window.location.href = "/login"; return; }
+    const { error: saveError } = await supabase.from("batches").insert({
+      user_id: user.id,
+      title: script.trim().slice(0, 80) || "Untitled batch",
+      language,
+      original_script: script,
+      tone,
+      hooks: batch.hooks,
+      captions: batch.captions,
+      hashtags: batch.hashtags,
+      generation_mode: batch.mode
+    });
+    setSaveStatus(saveError ? "Save failed — check Supabase migration and settings." : "Saved to your account.");
+  }
+
   function exportCsv() {
     if (!batch) return;
     const rows = [["Type", "Platform", "Content"], ...batch.hooks.map((h, i) => ["Hook " + (i + 1), "All", h]), ...platforms.map(p => ["Caption", p, batch.captions[p]])];
@@ -55,7 +78,7 @@ export default function Home() {
       <div className="sidebar-bottom"><div className="plan-card"><div className="plan-icon"><Zap size={16}/></div><b>Your creative runway</b><p>Explore the studio in preview mode. Connect an AI key to generate live content.</p><div className="plan-line"><i/></div><small>AI provider setup is the next step.</small></div><div className="user-row"><div className="user-avatar">VK</div><div><b>My workspace</b><small>Preview account</small></div><ChevronDown size={15}/></div></div>
     </aside>
     <section className="main">
-      <header className="topbar"><button className="mobile-menu" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle navigation"><Menu size={20}/></button><div className="crumb">Workspace <span>/</span> <b>Content studio</b></div><div className="top-right"><span className="status"><i/> STUDIO READY</span><div className="user-avatar">VK</div></div></header>
+      <header className="topbar"><button className="mobile-menu" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle navigation"><Menu size={20}/></button><div className="crumb">Workspace <span>/</span> <b>Content studio</b></div><div className="top-right"><a className="signin-link" href="/login">Sign in</a><span className="status"><i/> STUDIO READY</span><div className="user-avatar">VK</div></div></header>
       <div className="content" id="studio">
         <section className="hero"><div><div className="eyebrow"><Sparkles size={14}/> YOUR CONTENT, MULTIPLIED</div><h1>Make one idea go <em>further.</em></h1><p>Turn a script into a week of content, without the busywork.</p></div><div className="hero-stamp"><div><AudioLines size={25}/></div><span>CREATE ONCE<br/><b>SHARE EVERYWHERE</b></span></div></section>
         <div className="studio-grid">
@@ -83,7 +106,7 @@ export default function Home() {
             <div className="rail-card roadmap" id="roadmap"><div className="roadmap-kicker">ON THE ROADMAP <span>COMING NEXT</span></div><h3>From script to screen.</h3><p>Audio transcription, smart clip suggestions and subtitle-ready exports are next in the studio.</p><div className="roadmap-bar"><i/></div><small>Text studio · First milestone</small></div>
           </aside>
         </div>
-        <section className="results" id="results"><div className="results-head"><div><div className="eyebrow">02 / YOUR CONTENT BATCH</div><h2>{batch ? "Your ideas are ready." : "Your next batch starts here."}</h2><p>{batch ? "Edit any result before you copy or export it." : "Generate your first batch to see hooks and platform-ready captions here."}</p></div>{batch && <button className="export" onClick={exportCsv}><ArrowDownToLine size={16}/> Export CSV</button>}</div>
+        <section className="results" id="results"><div className="results-head"><div><div className="eyebrow">02 / YOUR CONTENT BATCH</div><h2>{batch ? "Your ideas are ready." : "Your next batch starts here."}</h2><p>{batch ? "Edit any result before you copy or export it." : "Generate your first batch to see hooks and platform-ready captions here."}</p></div>{batch && <div className="result-actions"><button className="save-button" onClick={saveBatch}>Save batch</button><button className="export" onClick={exportCsv}><ArrowDownToLine size={16}/> Export CSV</button></div>}</div>
           {!batch ? <div className="empty"><div className="empty-art"><span><Sparkles size={17}/></span><span><FileText size={18}/></span><b><WandSparkles size={25}/></b><span><Play size={16}/></span></div><h3>Good ideas deserve a bigger audience.</h3><p>Your generated hooks, captions and hashtags will appear here.</p></div> : <div className="output-grid">
             <div><div className="output-subhead"><h3>Hook ideas <span>{batch.hooks.length}</span></h3><button onClick={() => copyText(batch.hooks.map((h, i) => (i + 1) + ". " + h).join("\n"), "hooks")}>{copied === "hooks" ? <Check size={14}/> : <Copy size={14}/>} {copied === "hooks" ? "Copied" : "Copy all"}</button></div>
               {batch.hooks.map((hook, i) => <div className="hook-card" key={i}><span>{String(i + 1).padStart(2, "0")}</span><textarea aria-label={"Edit hook " + (i + 1)} value={hook} onChange={e => setBatch({...batch, hooks: batch.hooks.map((v, j) => j === i ? e.target.value : v)})}/><button onClick={() => copyText(hook, "hook" + i)} aria-label="Copy hook">{copied === "hook" + i ? <Check size={15}/> : <Copy size={15}/>}</button></div>)}
