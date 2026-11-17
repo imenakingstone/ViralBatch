@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 
 function safeEmail(value: FormDataEntryValue | null) {
@@ -28,7 +29,9 @@ export async function signUp(formData: FormData) {
   let supabase;
   try { supabase = await createClient(); }
   catch { redirect("/login?error=setup"); }
-  const { data, error } = await supabase.auth.signUp({ email, password });
+  const origin = (await headers()).get("origin");
+  const emailRedirectTo = origin ? new URL("/auth/confirm", origin).toString() : undefined;
+  const { data, error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo } });
   if (error) redirect("/login?error=signup");
   if (!data.session) redirect("/login?message=check-email");
   redirect("/");
