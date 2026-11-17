@@ -276,3 +276,20 @@ You are helping build **ViralBatch** in the existing GitHub repository:
 https://github.com/imenakingstone/ViralBatch
 
 Start by reading `PROGRESS.md`, this file, and the current repository structure. Then inspect the connected Supabase project without modifying it. Report what currently exists and identify the safest next implementation step. Do not assume the original planning actions created any code or database tables. Keep the work cloud-only, incremental, secure, and beginner-friendly.
+
+
+## 12. Implementation log — 2026-11-17
+
+The first code milestone has been added to the repository:
+- Next.js App Router and TypeScript foundation.
+- Responsive text content studio for script-to-hooks and platform captions.
+- Editable output, clipboard actions, and CSV export.
+- Server-side generation endpoint with request validation and timeout.
+- OpenAI-compatible server key configuration; deterministic preview mode is clearly labeled when no key exists.
+- Supabase migration for profiles and saved batches with RLS and explicit authenticated grants. This migration is documentation/code only and has not been run against the user's database.
+- GitHub Actions workflow for install, typecheck, lint, and production build.
+
+Current dependency versions were checked against npm on 2026-11-17: Next.js 16.4.6 and React 19.3.1. The project must be installed and validated in Codespaces before treating the code as working.
+
+### Outstanding
+Authentication, Supabase client integration, save/load history, real usage metering, payments, transcription, audio/video upload, clipping, FFmpeg rendering, subtitles, background workers, social publishing, production deployment, and human QA remain future work. See `PROGRESS.md` for the current verified next actions.
