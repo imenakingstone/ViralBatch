@@ -8,72 +8,82 @@ ViralBatch is a cloud-first SaaS for turning scripts, transcripts, and eventuall
 Repository: https://github.com/imenakingstone/ViralBatch
 Default branch: `main`
 
-## Verified implementation committed to GitHub
+## Implemented in the repository
 
-### Application
+### Content studio and AI
 - Next.js App Router + TypeScript foundation (Next.js 16.4.6, React 19.3.1).
-- Responsive content-studio dashboard.
-- Script/transcript input with validation, language/tone/hook-count controls.
-- Editable hooks and platform-specific captions.
-- Copy actions and CSV export.
-- Clearly labeled demo output when no OpenAI key is configured.
-
-### AI generation
-- Server-side OpenAI Chat Completions integration.
-- Input and response validation, request timeout, and server-only API key.
-- Live generation requires a verified Supabase user when an OpenAI key is configured.
-- Added an atomic database-backed daily quota: 30 live generations per user per UTC day. The API fails closed if the quota migration is missing or unavailable.
-- Demo mode remains available without credentials and does not consume paid AI tokens.
+- Responsive script-to-content studio with language, tone, and hook-count controls.
+- Server-side OpenAI integration, validated inputs, request timeout, and demo fallback.
+- Editable hooks and TikTok, Instagram Reels, and YouTube Shorts captions.
+- Copy actions, CSV export, and saved batch action.
+- Live AI requests require a verified Supabase user when an OpenAI key is configured.
+- Atomic database-backed limit of 30 live AI generations per signed-in user per UTC day.
+- Authenticated usage API and studio usage meter.
 
 ### Authentication and saved work
-- Supabase browser/server clients and Next.js 16 proxy session refresh.
-- Email/password sign-in and sign-up actions plus auth confirmation callback.
-- Authenticated batch save action and `/batches` history page.
-- Initial SQL migration creates profiles and batches with per-user RLS.
+- Supabase browser/server SSR clients and Next.js 16 proxy session refresh.
+- Email/password sign-in, sign-up, and confirmation callback.
+- Owner-scoped batch history, detail view, and deletion.
+- SQL RLS policies for profiles and saved batches.
 
-### Engineering and documentation
-- GitHub Actions workflow for dependency install, typecheck, lint, and build.
+### Media pipeline foundation (new)
+- Private Supabase Storage bucket design for source audio/video, limited to 512 MB per object and an allowlist of media MIME types.
+- Owner-scoped `media_jobs` table with lifecycle statuses, duration/transcript/clip-suggestion fields.
+- Storage object RLS policies isolate each user's folder.
+- Authenticated signed-upload URL endpoint validates file type/size and creates an awaiting-upload job.
+- Authenticated media jobs endpoint lists a user's jobs and confirms an uploaded object exists before marking it uploaded.
+- This is the secure backend foundation only: the browser upload UI, transcription, analysis, clip rendering, and background worker are not implemented.
+
+### Engineering
+- GitHub Actions workflow for install, typecheck, lint, and production build.
 - Weekly Dependabot updates.
-- `.env.example`, README, this tracker, and the master blueprint.
+- Environment example, README, master blueprint, and this progress tracker.
 
-## Database migrations
-1. `supabase/migrations/202611170001_initial_schema.sql` — profiles, batches, RLS and signup profile trigger.
-2. `supabase/migrations/202611170002_generation_usage.sql` — private usage ledger and atomic daily quota function.
+## Database migrations — apply only to a confirmed ViralBatch project
+1. `202611170001_initial_schema.sql`: profiles, batches, signup trigger, and RLS.
+2. `202611170002_generation_usage.sql`: private generation ledger, atomic consume-credit RPC, and usage-summary RPC.
+3. `202611170003_media_pipeline.sql`: media jobs, private Storage bucket, and per-user Storage policies.
 
-**Neither migration has been applied.** The connected Supabase account previously showed multiple projects and none was clearly confirmed as the ViralBatch database. Do not apply migrations to an unrelated project.
+**None of these migrations has been applied.** The connected Supabase account currently lists:
+- `MusicPlayer` — inactive
+- `glolex` — inactive
+- `FREE-CROSSPOSTER` — active
 
-## Not built yet
-- Secure media upload and object storage lifecycle.
-- Audio/video metadata inspection and validation.
-- Kinyarwanda/English speech-to-text evaluation and transcription.
-- Timestamped transcript editor.
-- AI clip candidate selection and manual trim controls.
-- FFmpeg background worker, job queue, 9:16 rendering, subtitles and ZIP export.
-- Subscription plans, billing, team workspaces and social publishing.
-- Production deployment, monitoring, backups and operational runbooks.
+There is no project clearly named ViralBatch. The FREE-CROSSPOSTER project must not be modified for ViralBatch without explicit confirmation that this is intentional. No new Supabase project was created.
 
-## Verification status and limitations
-- GitHub files and commits have been verified through the GitHub integration.
-- Assistant has not had a Codespaces terminal session, so npm install, typecheck, lint, production build, browser tests, and CI results are not verified.
-- No live OpenAI key has been configured or tested.
-- Supabase auth, RLS, saved batches, and the quota RPC are code-complete but remain unverified against a real project until the correct project is confirmed and migrations are applied.
-- The 30/day quota is an initial safety ceiling, not a paid subscription/credit system. It is UTC-based and can be tuned after product/business decisions.
-- Kinyarwanda generated copy needs fluent-speaker review before public use.
+## CI and verification
+- GitHub Actions successfully installed dependencies and passed TypeScript typecheck on the inspected run.
+- An earlier CI run failed lint due to three JSX apostrophe/link issues; those were fixed in later commits.
+- The newest run must be checked for final lint/build status before declaring CI green.
+- No direct Codespaces terminal/browser session was available to the assistant.
+- No live Supabase migrations, auth, Storage uploads, or OpenAI calls have been tested.
+- GitHub Actions reported 14 high-severity npm audit findings during install. These need dependency-by-dependency review; do not run `npm audit fix --force` blindly.
 - No secrets were committed and no paid infrastructure or deployment was created.
 
-## Human-only actions to handle when available
-- Confirm which Supabase project is specifically for ViralBatch.
-- Add Supabase URL and publishable key to Codespaces/deployment environment secrets.
-- Add the OpenAI API key securely only after auth and quota migrations are applied and tested.
-- Review/apply the two migrations to the confirmed project.
-- Review Kinyarwanda output and approve public launch/deployment and any spending.
+## Still not implemented
+- Browser upload interface with progress, cancellation, and retry.
+- File metadata/duration probing and upload-completion hardening.
+- Kinyarwanda/English speech-to-text benchmarking and transcription.
+- Timestamped transcript editor.
+- AI clip candidate selection and manual trim controls.
+- FFmpeg worker, queue, 9:16 rendering, subtitle generation, and export.
+- Billing, plans/credits, team workspaces, social publishing.
+- Production deployment, monitoring, backups, and operational runbooks.
 
-## Next AI-buildable tasks
-1. Add a user-facing usage endpoint and show remaining daily live generations in the studio.
-2. Add batch detail viewing and deletion with owner-scoped server-side authorization.
-3. Improve request validation, observability, and automated tests around the generation API.
-4. Design the media-processing job/data model and upload policy before implementing video upload.
-5. Research Kinyarwanda speech-to-text options and create an evaluation harness before choosing a model.
+## Human approval / credentials still needed
+- Identify or create the dedicated ViralBatch Supabase project. The existing projects do not clearly match ViralBatch; selecting FREE-CROSSPOSTER would risk changing another application.
+- Add the dedicated project's URL and publishable key to Codespaces/deployment secrets.
+- Add the OpenAI API key securely after auth, RLS, and quota setup has been tested.
+- Review and apply the three migrations to the confirmed project.
+- Have a fluent Kinyarwanda speaker review generated/transcribed content before launch.
+- Approve production deployment, public launch, and any spending.
+
+## Next AI-buildable work
+1. Build the browser upload UI using the signed-upload and job APIs.
+2. Add file duration/metadata validation and secure upload cleanup.
+3. Add a processing adapter interface and background job contract.
+4. Research/evaluate speech-to-text options for Kinyarwanda and English.
+5. Add tests for auth gates, quotas, ownership, media validation, and job lifecycle.
 
 ## Development rules
 - Keep all work cloud-first; do not require the user's local PC.
@@ -82,15 +92,9 @@ Default branch: `main`
 - Never commit secrets.
 - Keep this file updated after meaningful work sessions.
 
-## Continued AI build session — 2026-11-17 evening
-
-- Added migration `202611170002_generation_usage.sql`: private generation usage ledger plus an atomic PostgreSQL function that allows up to 30 live AI generations per signed-in user per UTC day. The function serializes concurrent requests per user/day and fails closed if auth is absent.
-- Updated `POST /api/generate` to consume a quota credit before calling the paid AI provider and return clear 429/503 responses when the limit is reached or quota infrastructure is unavailable.
-- Added authenticated saved-batch deletion using a server action; the action checks the signed-in user and scopes deletion to that user's own row. Added responsive button styling.
-- Rewrote this progress tracker to remove stale statements that contradicted the implemented code.
-- Updated README with the second migration and daily quota behavior.
-- All changes are committed on `main`. They are code-level implementations only; no migrations or tests have been run against a live Supabase project.
-
-- Added authenticated `GET /api/usage` and a studio usage display showing remaining daily live generations and UTC reset time for signed-in users. Added a read-only security-definer RPC; the usage ledger remains inaccessible directly to client roles.
-
-- Added a secure saved-batch detail route at `/batches/[id]` that verifies the session, validates the UUID, and queries only the current user's batch. The history list now links to details; saved content displays the original script, hooks, captions, hashtags, language, tone, and creation time.
+## Work completed in the 2026-11-17 evening session
+- Added quota enforcement, usage summary endpoint/UI, and authenticated saved-batch detail/deletion workflows.
+- Fixed lint findings discovered in GitHub Actions: escaped JSX apostrophes and switched internal navigation to Next.js Link/router APIs.
+- Added the third migration for private media storage and owner-scoped media jobs.
+- Added authenticated signed-upload URL creation, upload job listing, and upload confirmation APIs.
+- Updated README and master blueprint with current capabilities and remaining human approvals.
