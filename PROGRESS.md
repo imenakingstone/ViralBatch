@@ -102,3 +102,21 @@ There is no project clearly named ViralBatch. The FREE-CROSSPOSTER project must 
 - Researched Google Cloud Speech-to-Text V2 and Pindo as Kinyarwanda transcription candidates; added an evaluation plan and WER/CER utility.
 - Added an ASR evaluation guide that keeps private audio and transcripts out of the public repository.
 - Updated README and master blueprint with current capabilities and remaining human approvals.
+
+
+## Additional AI-buildable work completed — 2026-11-17
+
+### Media processing and Kinyarwanda transcription
+- Added fourth migration `202611170004_media_worker_queue.sql` with service-role-only RPCs to claim, complete, and fail media jobs. Uses `FOR UPDATE SKIP LOCKED` for safe concurrent workers, three attempts, 20-minute stale lease recovery, and final failure handling.
+- Added isolated Node 22 container worker at `workers/media-processor/`. It downloads owner-private source media, calls Pindo's authenticated Kinyarwanda STT endpoint, and stores plain transcript text on the job.
+- Added worker deployment documentation and environment requirements. Service-role and Pindo credentials are runtime secrets only; no credentials have been created or committed.
+- Added media job list/transcript display and a refresh action to the studio. The job API returns only the current user's media jobs and transcript fields.
+- Added a CI syntax check for the worker JavaScript.
+- Updated README and migration instructions to include all four migrations and the separately deployed worker.
+
+### Important limitations
+- The worker has not been deployed or run because the dedicated ViralBatch Supabase project and Pindo token are not configured.
+- The worker currently handles Kinyarwanda plain-text transcription only; no word timestamps, speaker diarization, automatic clips, FFmpeg render, or subtitle generation yet.
+- The worker default limit is 100 MiB although private source storage allows 512 MiB. Large-file streaming/chunking and provider limits need later work.
+- Provider privacy/retention and consent flow need review before sending customer media to Pindo.
+- Existing connected Supabase projects are MusicPlayer, glolex, and FREE-CROSSPOSTER; none is confirmed as ViralBatch. Do not apply these migrations to another app's database.
