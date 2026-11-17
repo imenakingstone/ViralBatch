@@ -57,7 +57,7 @@ The migrations create profiles, saved batches, a private usage ledger, and media
 - CHAT_HISTORY_AND_BLUEPRINT.md — conversation history and product blueprint.
 
 ## Not implemented yet
-Paid subscription/credit plans, actual browser upload UI, Kinyarwanda transcription, audio/video inspection, clip selection, FFmpeg rendering, subtitles, background workers, publishing integrations, and production deployment.
+Paid subscription/credit plans, upload progress/cancellation/resumable large-file transfers, Kinyarwanda transcription, audio/video inspection, clip selection, FFmpeg rendering, subtitles, background workers, publishing integrations, and production deployment.
 
 ## Important
 This project is not production-ready until dependencies are installed, type/lint/build checks pass, auth and RLS are tested, secrets are configured securely, and real Kinyarwanda outputs are reviewed by fluent speakers. Provider pricing, availability, and model support can change; verify before launch.
