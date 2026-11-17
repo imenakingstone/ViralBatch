@@ -229,3 +229,14 @@ h1,h2,h3,.brand,.step,.platforms h3,.roadmap h3,.results-head h2{font-family:'Ma
   .media-note,.media-status{color:#a0b0a6}
 }
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+
+/* Creator brief controls: audience and brand context */
+.creator-context{grid-template-columns:repeat(3,minmax(0,1fr))}
+.context-field{min-width:0;display:grid;gap:8px}
+.context-field .field-label span{font-size:8px;letter-spacing:.6px;color:var(--muted);margin-left:4px}
+.context-field input{width:100%;min-width:0;height:43px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--ink);outline:none;font:inherit;font-size:12px}
+.context-field input:focus{border-color:var(--green);box-shadow:0 0 0 3px color-mix(in srgb,var(--green) 14%,transparent)}
+@media(max-width:820px){.creator-context{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.creator-context{grid-template-columns:1fr}}
+@media(prefers-color-scheme:dark){.context-field input{background:#18221d;border-color:#2b3931;color:#edf5ef}.context-field input::placeholder{color:#819188}}
