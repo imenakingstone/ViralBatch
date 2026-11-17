@@ -38,6 +38,10 @@ export async function POST(request: Request) {
   const script = typeof input.script === "string" ? input.script.trim().slice(0, 12000) : "";
   const language = typeof input.language === "string" ? input.language : "English";
   const tone = typeof input.tone === "string" ? input.tone.slice(0, 40) : "Engaging";
+  const allowedGoals = ["Grow audience", "Educate audience", "Build community", "Drive sales", "Increase engagement"];
+  const contentGoal = typeof input.contentGoal === "string" && allowedGoals.includes(input.contentGoal) ? input.contentGoal : "Grow audience";
+  const targetAudience = typeof input.targetAudience === "string" ? input.targetAudience.trim().slice(0, 120) : "";
+  const brandVoice = typeof input.brandVoice === "string" ? input.brandVoice.trim().slice(0, 280) : "";
   const n = Number(input.count);
   const count = Number.isFinite(n) ? Math.min(10, Math.max(3, Math.floor(n))) : 5;
 
@@ -87,8 +91,8 @@ export async function POST(request: Request) {
         temperature: 0.8,
         response_format: { type: "json_object" },
         messages: [
-          { role: "system", content: "You are ViralBatch, an expert short-form content strategist. Return only valid JSON with keys hooks (array of strings), captions (object with exact keys TikTok, Instagram Reels, YouTube Shorts), and hashtags (array of strings). Do not invent facts absent from the source. Hooks must be distinct and truthful. Captions should be platform-appropriate and editable. Respect the requested language. For Kinyarwanda, use natural idiomatic language and do not invent idioms when uncertain." },
-          { role: "user", content: JSON.stringify({ script, language, tone, hookCount: count }) }
+          { role: "system", content: "You are ViralBatch, an expert short-form content strategist. Return only valid JSON with keys hooks (array of strings), captions (object with exact keys TikTok, Instagram Reels, YouTube Shorts), and hashtags (array of strings). Do not invent facts absent from the source. Hooks must be distinct and truthful. Captions should be platform-appropriate and editable. Align calls to action with the selected content goal. Adapt examples and framing to the target audience without stereotyping or inventing audience facts. Follow the brand voice notes while preserving the creator's meaning. Respect the requested language. For Kinyarwanda, use natural idiomatic language and do not invent idioms when uncertain." },
+          { role: "user", content: JSON.stringify({ script, language, tone, contentGoal, targetAudience, brandVoice, hookCount: count }) }
         ]
       }),
       signal: AbortSignal.timeout(25000)
