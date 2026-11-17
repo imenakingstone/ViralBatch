@@ -310,3 +310,11 @@ Important remaining safety work: do not expose the AI generation endpoint with a
 - Added Dependabot configuration for weekly npm and GitHub Actions dependency updates.
 
 - The live generation route now requires a verified Supabase user whenever a billable OpenAI key is present. Without an AI key, the route stays in clearly labeled demo mode. Durable rate limits, per-user usage metering, and abuse monitoring remain required before public launch.
+
+
+## Continued implementation log — 2026-11-17 evening
+- Added a second Supabase migration for a private generation-usage ledger and atomic daily quota function (30 live AI generations per signed-in user per UTC day).
+- The live generation API now consumes a quota before spending OpenAI tokens and fails closed if the quota database function is unavailable.
+- Added owner-authorized deletion of saved batches from the history page.
+- Updated README and PROGRESS.md to reflect the actual implementation and the remaining human setup.
+- These database-backed features still require the correct Supabase project to be confirmed and both migrations to be applied. They have not been live-tested.
