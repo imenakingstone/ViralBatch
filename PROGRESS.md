@@ -2,136 +2,82 @@
 
 _Last updated: 2026-11-17_
 
-## Project identity
-- **Name:** ViralBatch
-- **Tagline:** Batch-create your TikToks, Reels, and Shorts in one click.
-- **Product:** A cloud-based SaaS that turns long videos, audio, or scripts into short-form clips, hooks, subtitles, and platform-ready captions in batches.
-- **Initial market:** Global creators and agencies, with strong support for Kinyarwanda and English for Rwanda/East Africa.
+## Product
+ViralBatch is a cloud-first SaaS for turning scripts, transcripts, and eventually long videos/audio into batches of short-form hooks, captions, subtitles, and clips for TikTok, Instagram Reels, and YouTube Shorts. English, Kinyarwanda, mixed-language, and French text workflows are planned.
 
-## Current repository status
-- GitHub repository: https://github.com/imenakingstone/ViralBatch
-- Default branch: `main`
-- Repository was found and is accessible through the connected GitHub integration.
-- `README.md` exists and currently contains only the project heading.
-- This document and `CHAT_HISTORY_AND_BLUEPRINT.md` are being added as the project documentation foundation.
-- No application implementation has been verified yet.
-- No Supabase schema or deployed application has been verified yet.
+Repository: https://github.com/imenakingstone/ViralBatch
+Default branch: `main`
 
-## Product scope
+## Verified implementation committed to GitHub
 
-### MVP (build first)
-1. A clean, responsive SaaS dashboard.
-2. Paste a script or transcript.
-3. Choose output language: English or Kinyarwanda (allow mixed-language source text where practical).
-4. Generate multiple hooks and platform-specific captions for TikTok, Instagram Reels, and YouTube Shorts.
-5. Let users edit and select generated results.
-6. Export captions and content plans as CSV.
-7. Save generation history after authentication and database setup.
+### Application
+- Next.js App Router + TypeScript foundation (Next.js 16.4.6, React 19.3.1).
+- Responsive content-studio dashboard.
+- Script/transcript input with validation, language/tone/hook-count controls.
+- Editable hooks and platform-specific captions.
+- Copy actions and CSV export.
+- Clearly labeled demo output when no OpenAI key is configured.
 
-### Later video features
-1. Upload audio/video securely.
-2. Transcribe Kinyarwanda and English audio and retain timestamps.
-3. Detect promising moments and suggest clip start/end times.
-4. Render vertical 9:16 clips with FFmpeg.
-5. Add subtitle styles, safe margins, and optional speaker-aware reframing.
-6. Download batches as MP4 files and ZIP archives.
+### AI generation
+- Server-side OpenAI Chat Completions integration.
+- Input and response validation, request timeout, and server-only API key.
+- Live generation requires a verified Supabase user when an OpenAI key is configured.
+- Added an atomic database-backed daily quota: 30 live generations per user per UTC day. The API fails closed if the quota migration is missing or unavailable.
+- Demo mode remains available without credentials and does not consume paid AI tokens.
 
-### Later business features
-- Usage credits and plan limits.
-- Subscription and payment integration after provider eligibility and business requirements are checked.
-- Team/agency workspaces, brand voice presets, and scheduled publishing/export integrations.
+### Authentication and saved work
+- Supabase browser/server clients and Next.js 16 proxy session refresh.
+- Email/password sign-in and sign-up actions plus auth confirmation callback.
+- Authenticated batch save action and `/batches` history page.
+- Initial SQL migration creates profiles and batches with per-user RLS.
 
-## Architecture direction
-- **Frontend:** Next.js (React) and Tailwind CSS.
-- **Database/auth:** Supabase (Postgres, Auth, and Storage where suitable).
-- **AI text generation:** Provider abstraction so the app can support an LLM provider without hard-coding one vendor.
-- **Speech recognition:** Evaluate Kinyarwanda-capable models and services using real local audio before selecting production default. Compare transcription accuracy, timestamps, latency, licensing, privacy, and total cost.
-- **Video processing:** FFmpeg in a separate containerized worker; do not run long video jobs inside short-lived frontend/serverless requests.
-- **Background jobs:** Add a durable queue when video processing is introduced.
-- **Hosting:** Deploy frontend and worker separately. Select hosting based on actual CPU/RAM/GPU requirements and measured costs.
-- **Storage:** Use object storage for large media; define upload limits, retention, and deletion policies.
+### Engineering and documentation
+- GitHub Actions workflow for dependency install, typecheck, lint, and build.
+- Weekly Dependabot updates.
+- `.env.example`, README, this tracker, and the master blueprint.
 
-## Important development rules
-1. **Cloud-only:** The project must be developed and operated online. Do not require the user's local PC for coding, running, or processing.
-2. **Incremental work:** Implement one small, testable feature at a time. Do not rewrite working areas unnecessarily.
-3. **Inspect before changing:** Read the existing repository files and database state before proposing or applying modifications.
-4. **No invented completion:** Mark a task complete only after verifying the code, test, deployment, or database change.
-5. **Secrets:** Never commit API keys, service-role keys, OAuth secrets, access tokens, or passwords. Use deployment environment variables and secret stores.
-6. **Progress tracking:** Update this file at the end of each meaningful work session with verified accomplishments, issues, and the exact next task.
-7. **Beginner-friendly guidance:** Explain actions plainly and avoid requiring terminal commands when the GitHub browser UI or connected tools can perform the task.
-8. **Data safety:** Use Supabase RLS for user-owned records; validate uploads and file types; enforce authorization server-side.
+## Database migrations
+1. `supabase/migrations/202611170001_initial_schema.sql` — profiles, batches, RLS and signup profile trigger.
+2. `supabase/migrations/202611170002_generation_usage.sql` — private usage ledger and atomic daily quota function.
 
-## Roadmap and status
+**Neither migration has been applied.** The connected Supabase account previously showed multiple projects and none was clearly confirmed as the ViralBatch database. Do not apply migrations to an unrelated project.
 
-| Phase | Work | Status |
-|---|---|---|
-| 1 | Repository and project documentation | In progress |
-| 2 | Inspect/confirm Supabase project and design schema | Not started |
-| 3 | Build responsive Next.js foundation and dashboard | Not started |
-| 4 | Build script-to-hooks/captions generation MVP | Not started |
-| 5 | Add authentication, saved batches, and RLS | Not started |
-| 6 | CSV export and user editing workflow | Not started |
-| 7 | Evaluate Kinyarwanda/English transcription | Not started |
-| 8 | Add uploads, background jobs, FFmpeg clipping and subtitles | Not started |
-| 9 | Credits, payments, deployment, monitoring and launch | Not started |
+## Not built yet
+- Secure media upload and object storage lifecycle.
+- Audio/video metadata inspection and validation.
+- Kinyarwanda/English speech-to-text evaluation and transcription.
+- Timestamped transcript editor.
+- AI clip candidate selection and manual trim controls.
+- FFmpeg background worker, job queue, 9:16 rendering, subtitles and ZIP export.
+- Subscription plans, billing, team workspaces and social publishing.
+- Production deployment, monitoring, backups and operational runbooks.
 
-## Immediate next steps
-1. Verify both documentation files are present on the GitHub `main` branch.
-2. Inspect the connected Supabase project and confirm whether it is the intended project before creating or modifying tables.
-3. Review the existing repository structure and choose the smallest safe implementation step.
-4. Build the MVP foundation before video rendering or paid integrations.
+## Verification status and limitations
+- GitHub files and commits have been verified through the GitHub integration.
+- Assistant has not had a Codespaces terminal session, so npm install, typecheck, lint, production build, browser tests, and CI results are not verified.
+- No live OpenAI key has been configured or tested.
+- Supabase auth, RLS, saved batches, and the quota RPC are code-complete but remain unverified against a real project until the correct project is confirmed and migrations are applied.
+- The 30/day quota is an initial safety ceiling, not a paid subscription/credit system. It is UTC-based and can be tuned after product/business decisions.
+- Kinyarwanda generated copy needs fluent-speaker review before public use.
+- No secrets were committed and no paid infrastructure or deployment was created.
 
-## Session log
-### 2026-11-17
-- Located repository `imenakingstone/ViralBatch` on GitHub.
-- Confirmed `README.md` exists.
-- Confirmed `PROGRESS.md` and `CHAT_HISTORY_AND_BLUEPRINT.md` were not present before this documentation setup.
-- Next: verify the new documentation commits and inspect Supabase/repository state before implementation.
+## Human-only actions to handle when available
+- Confirm which Supabase project is specifically for ViralBatch.
+- Add Supabase URL and publishable key to Codespaces/deployment environment secrets.
+- Add the OpenAI API key securely only after auth and quota migrations are applied and tested.
+- Review/apply the two migrations to the confirmed project.
+- Review Kinyarwanda output and approve public launch/deployment and any spending.
 
+## Next AI-buildable tasks
+1. Add a user-facing usage endpoint and show remaining daily live generations in the studio.
+2. Add batch detail viewing and deletion with owner-scoped server-side authorization.
+3. Improve request validation, observability, and automated tests around the generation API.
+4. Design the media-processing job/data model and upload policy before implementing video upload.
+5. Research Kinyarwanda speech-to-text options and create an evaluation harness before choosing a model.
 
-## Implementation update — 2026-11-17 (AI build session)
-
-### Implemented and committed to GitHub
-- Initialized a Next.js App Router + TypeScript project structure under `src/app`.
-- Added a responsive ViralBatch content-studio interface with script input, word/character count, language/tone/hook-count controls, editable hook results, platform caption tabs, copy actions, and CSV export.
-- Added a server-side `POST /api/generate` endpoint with input validation, output shape checks, timeout handling, and server-only OpenAI API key access.
-- Added a clearly labeled deterministic preview mode when `OPENAI_API_KEY` is not configured. Preview output is not represented as live AI output.
-- Added `.env.example` without secrets and a README with Codespaces setup instructions.
-- Added a Supabase SQL migration for profiles and saved batches, including authenticated-only grants, RLS policies, user ownership checks, and a new-user profile trigger. The migration is committed but has NOT been applied to Supabase.
-- Added a GitHub Actions workflow to install dependencies and run typecheck, lint, and production build on pushes and pull requests.
-- Updated dependencies to the current stable Next.js 16.4.6 and React 19.3.1 based on the npm package registry check on 2026-11-17.
-
-### Not yet verified
-- No Codespaces terminal execution was available through the GitHub repository connector, so `npm install`, typecheck, lint, and production build have NOT been run by the assistant.
-- GitHub Actions workflow has been committed; its run result must be checked in the repository Actions tab.
-- No live AI key is configured or tested.
-- Supabase project identity was not confirmed and no database changes were applied.
-- No user authentication, persistent batch saving, credits, billing, transcription, video processing, or publishing integrations are implemented yet.
-
-### Exact next steps
-1. In the existing Codespace, run `npm install`, then `npm run typecheck`, `npm run lint`, and `npm run build`; share any errors for fixes.
-2. Check GitHub Actions for the automated validation result.
-3. Confirm the correct Supabase project, then review and apply `supabase/migrations/202611170001_initial_schema.sql` only after approval.
-4. Add a server-side `OPENAI_API_KEY` to Codespaces Secrets or deployment environment variables if live generation is desired; never commit it.
-5. Implement Supabase Auth and save/load batch history after the project URL and publishable key are configured.
-6. Have fluent Kinyarwanda speakers review generated copy before public use.
-
-### Safety and scope notes
-- No secrets were added to the repository.
-- No paid resources were created, no deployment was triggered, and no database was modified.
-- Preview mode is for interface testing only; it does not replace a configured AI provider.
-
-- Supabase account inspection found three existing projects, none named ViralBatch. No database migration was applied because the correct target project is not confirmed; do not use an unrelated existing project.
-- Current stable package versions were checked on npm: Next.js 16.4.6 and React 19.3.1. Official Next.js installation guidance recommends the App Router and TypeScript foundation. Supabase RLS guidance informed the explicit authenticated-role grants, per-user policies, and indexed ownership column.
-- The live generation endpoint currently has no authentication or durable rate limiting. Do not deploy it with a paid AI key until authentication, abuse controls, and usage limits are implemented.
-
-- Added Supabase SSR browser/server clients, Next.js 16 proxy session refresh, email/password sign-in and sign-up actions, email confirmation callback, and a save-batch action. These features remain configuration-dependent and are not verified against a live Supabase project.
-- Added a Save batch control that writes to the RLS-protected `batches` table for the authenticated user. It will only work after the correct Supabase project is configured and the migration is applied.
-- Supabase account project list did not include a project named ViralBatch. Existing projects were left untouched; the intended database still needs to be confirmed.
-
-- Added authenticated saved-batch history at `/batches`; the page reads only the current user's rows through Supabase RLS and shows a setup/migration message if the table is unavailable.
-- Added weekly Dependabot updates for npm packages and GitHub Actions.
-- The UI now includes a sign-in link, a Save batch action, and a My batches route. All account/database actions remain unverified until a correct Supabase project is configured.
-
-- Hardened the live AI route: if an OpenAI key is configured, the route now refuses to run unless Supabase URL/publishable key are configured and the request has a verified signed-in user. Demo mode remains available without external credentials.
-- Durable rate limits, per-user credit metering, and abuse monitoring are still not implemented; keep the live AI key disabled until those are built and tested.
+## Development rules
+- Keep all work cloud-first; do not require the user's local PC.
+- Inspect files before changing them; make small incremental commits.
+- Never mark a feature tested unless an actual test ran.
+- Never commit secrets.
+- Keep this file updated after meaningful work sessions.
