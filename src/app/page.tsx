@@ -19,7 +19,7 @@ export default function Home() {
   const [error, setError] = useState("");
   const [copied, setCopied] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
-  const words = useMemo(() => script.trim() ? script.trim().split(/\\s+/).length : 0, [script]);
+  const words = useMemo(() => script.trim() ? script.trim().split(/\s+/).length : 0, [script]);
 
   async function generate() {
     if (script.trim().length < 20) { setError("Add at least 20 characters so ViralBatch has enough context."); return; }
@@ -41,8 +41,8 @@ export default function Home() {
   function exportCsv() {
     if (!batch) return;
     const rows = [["Type", "Platform", "Content"], ...batch.hooks.map((h, i) => ["Hook " + (i + 1), "All", h]), ...platforms.map(p => ["Caption", p, batch.captions[p]])];
-    const csv = rows.map(row => row.map(v => '"' + v.replaceAll('"', '""') + '"').join(",")).join("\\r\\n");
-    const url = URL.createObjectURL(new Blob(["\\uFEFF" + csv], { type: "text/csv;charset=utf-8;" }));
+    const csv = rows.map(row => row.map(v => '"' + v.replaceAll('"', '""') + '"').join(",")).join("\r\n");
+    const url = URL.createObjectURL(new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" }));
     const link = document.createElement("a"); link.href = url; link.download = "viralbatch-content-batch.csv"; link.click(); URL.revokeObjectURL(url);
   }
 
@@ -85,7 +85,7 @@ export default function Home() {
         </div>
         <section className="results" id="results"><div className="results-head"><div><div className="eyebrow">02 / YOUR CONTENT BATCH</div><h2>{batch ? "Your ideas are ready." : "Your next batch starts here."}</h2><p>{batch ? "Edit any result before you copy or export it." : "Generate your first batch to see hooks and platform-ready captions here."}</p></div>{batch && <button className="export" onClick={exportCsv}><ArrowDownToLine size={16}/> Export CSV</button>}</div>
           {!batch ? <div className="empty"><div className="empty-art"><span><Sparkles size={17}/></span><span><FileText size={18}/></span><b><WandSparkles size={25}/></b><span><Play size={16}/></span></div><h3>Good ideas deserve a bigger audience.</h3><p>Your generated hooks, captions and hashtags will appear here.</p></div> : <div className="output-grid">
-            <div><div className="output-subhead"><h3>Hook ideas <span>{batch.hooks.length}</span></h3><button onClick={() => copyText(batch.hooks.map((h, i) => (i + 1) + ". " + h).join("\\n"), "hooks")}>{copied === "hooks" ? <Check size={14}/> : <Copy size={14}/>} {copied === "hooks" ? "Copied" : "Copy all"}</button></div>
+            <div><div className="output-subhead"><h3>Hook ideas <span>{batch.hooks.length}</span></h3><button onClick={() => copyText(batch.hooks.map((h, i) => (i + 1) + ". " + h).join("\n"), "hooks")}>{copied === "hooks" ? <Check size={14}/> : <Copy size={14}/>} {copied === "hooks" ? "Copied" : "Copy all"}</button></div>
               {batch.hooks.map((hook, i) => <div className="hook-card" key={i}><span>{String(i + 1).padStart(2, "0")}</span><textarea aria-label={"Edit hook " + (i + 1)} value={hook} onChange={e => setBatch({...batch, hooks: batch.hooks.map((v, j) => j === i ? e.target.value : v)})}/><button onClick={() => copyText(hook, "hook" + i)} aria-label="Copy hook">{copied === "hook" + i ? <Check size={15}/> : <Copy size={15}/>}</button></div>)}
             </div>
             <div><div className="output-subhead"><h3>Platform captions</h3><span className={batch.mode === "ai" ? "mode ai" : "mode"}>{batch.mode === "ai" ? "AI GENERATED" : "PREVIEW MODE"}</span></div>
