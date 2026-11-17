@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { getIntegrationStatus } from "@/lib/integrations/catalog";
+import { getIntegrationStatus, getRoleCapabilities } from "@/lib/integrations/catalog";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -23,6 +23,7 @@ export async function GET() {
 
   return NextResponse.json({
     role: profile.role,
+    roleCapabilities: getRoleCapabilities(profile.role),
     integrations,
     enabledCapabilities: integrations.filter(item => item.connected).flatMap(item => item.capabilities)
   }, { headers: { "Cache-Control": "no-store" } });
