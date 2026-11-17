@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createClient as createSupabaseClient } from "@/lib/supabase/client";
 import { AudioLines, ArrowDownToLine, ArrowRight, BadgeCheck, Check, ChevronDown, Clapperboard, Copy, FileText, Instagram, Languages, Menu, Play, Sparkles, WandSparkles, Youtube, Zap } from "lucide-react";
 
@@ -21,7 +21,16 @@ export default function Home() {
   const [copied, setCopied] = useState("");
   const [saveStatus, setSaveStatus] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [usage, setUsage] = useState<{ used: number; remaining: number; dailyLimit: number } | null>(null);
   const words = useMemo(() => script.trim() ? script.trim().split(/\s+/).length : 0, [script]);
+
+  useEffect(() => {
+    let active = true;
+    fetch("/api/usage").then(async response => response.ok ? response.json() : null).then(data => {
+      if (active && data && Number.isFinite(data.remaining)) setUsage(data);
+    }).catch(() => undefined);
+    return () => { active = false; };
+  }, []);
 
   async function generate() {
     if (script.trim().length < 20) { setError("Add at least 20 characters so ViralBatch has enough context."); return; }
@@ -75,7 +84,7 @@ export default function Home() {
       <div className="workspace"><div className="workspace-avatar">V</div><div><b>Creator workspace</b><small>Preview workspace</small></div><ChevronDown size={15}/></div>
       <p className="nav-label">WORKSPACE</p>
       <nav><a className="nav-link selected" href="#studio"><WandSparkles size={17}/> Content studio <i/></a><a className="nav-link" href="/batches"><FileText size={17}/> My batches</a><a className="nav-link muted" href="#roadmap"><Clapperboard size={17}/> Video tools <span>SOON</span></a></nav>
-      <div className="sidebar-bottom"><div className="plan-card"><div className="plan-icon"><Zap size={16}/></div><b>Your creative runway</b><p>Explore the studio in preview mode. Connect an AI key to generate live content.</p><div className="plan-line"><i/></div><small>AI provider setup is the next step.</small></div><div className="user-row"><div className="user-avatar">VK</div><div><b>My workspace</b><small>Preview account</small></div><ChevronDown size={15}/></div></div>
+      <div className="sidebar-bottom"><div className="plan-card"><div className="plan-icon"><Zap size={16}/></div><b>Your creative runway</b><p>{usage ? `You have ${usage.remaining} of ${usage.dailyLimit} live generations left today.` : "Explore the studio in preview mode. Sign in and connect the AI service to use live generation."}</p><div className="plan-line"><i/></div><small>{usage ? `${usage.used} used today · Resets at 00:00 UTC` : "Daily usage appears here after account setup."}</small></div><div className="user-row"><div className="user-avatar">VK</div><div><b>My workspace</b><small>Preview account</small></div><ChevronDown size={15}/></div></div>
     </aside>
     <section className="main">
       <header className="topbar"><button className="mobile-menu" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle navigation"><Menu size={20}/></button><div className="crumb">Workspace <span>/</span> <b>Content studio</b></div><div className="top-right"><a className="signin-link" href="/login">Sign in</a><span className="status"><i/> STUDIO READY</span><div className="user-avatar">VK</div></div></header>
