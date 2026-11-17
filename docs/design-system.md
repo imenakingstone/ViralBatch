@@ -36,7 +36,7 @@ Dark mode follows the operating-system preference using `prefers-color-scheme`. 
 ## Information architecture
 - Persistent desktop sidebar: workspace identity, Studio, My batches, Integrations, future Video tools, usage/plan area.
 - Top bar: breadcrumb, sign-in/account controls, studio status.
-- Studio: creation form and settings in the primary column; platform guidance and tips in a secondary rail; media upload and processing state below; generated hooks/captions in an editable results panel.
+- Studio: creation form and settings in the primary column, including content goal, target audience, and brand-voice context; platform guidance and tips in a secondary rail; media upload and processing state below; generated hooks/captions in an editable results panel.
 - My batches: concise saved-work list with clear empty state and detail links.
 - Batch detail: script, hooks, platform captions, hashtags and metadata in readable sections.
 - Integrations: role banner and provider cards that clearly distinguish configured credentials from fully authorized social accounts.
@@ -57,3 +57,10 @@ The first pass is implemented in `src/app/globals.css` with semantic variables, 
 - Verify system light/dark appearance and focus visibility.
 - Run lint, typecheck and production build in GitHub Actions.
 - Review any contrast failures with browser tooling before launch.
+
+
+## Creator brief controls
+- Group language, style, hook count, and content goal together in a responsive three-column grid (two columns on tablet, one on narrow mobile).
+- Keep target audience and brand voice optional, visibly labeled, and length-limited.
+- The selected goal should shape the call to action; audience and voice should guide framing without inventing facts or stereotyping.
+- Persist the brief with saved batches so users can understand how an output was generated.
