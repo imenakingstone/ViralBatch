@@ -16,7 +16,8 @@ ViralBatch is a cloud-first content studio for turning scripts and transcripts i
 - Supabase email/password auth and saved batch history (configuration-dependent).
 - Supabase RLS migrations for user-owned profiles/batches.
 - Atomic daily live-generation quota: 30 requests per signed-in user per UTC day (requires the second migration).
-- Private source-media bucket, owner-scoped media job records, and authenticated signed-upload/job APIs (requires the third migration).
+- Private source-media bucket, owner-scoped media jobs, signed uploads, job status, and transcript display (requires migrations 3 and 4).
+- Separate Node 22 media worker with a PostgreSQL-backed queue, retry leases, and Pindo Kinyarwanda transcription adapter.
 
 ## Cloud development (GitHub Codespaces)
 
@@ -43,23 +44,35 @@ Restart the development server after changing environment variables. Never add a
 
 ## Supabase setup (human approval required)
 1. Confirm the intended Supabase project.
-2. Review all three SQL files in `supabase/migrations/` in filename order.
-3. Apply all three migrations in the Supabase SQL Editor only after confirming the project and reviewing the SQL.
+2. Review all four SQL files in `supabase/migrations/` in filename order.
+3. Apply all four migrations in the Supabase SQL Editor only after confirming the project and reviewing the SQL.
 4. Add `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` to your environment. The sign-in/sign-up UI and cookie-based SSR clients are implemented; authentication will work only after valid project settings and the migration are in place.
 
-The migrations create profiles, saved batches, a private usage ledger, and media processing job records; enable RLS; and scope user data to the signed-in user. The second migration limits live AI generation to 30 requests per user per UTC day. The third migration creates a private `source-media` bucket (512 MB per object) with per-user Storage policies. No migrations have been applied to a database.
+The migrations create profiles, saved batches, a private usage ledger, and media processing job records; enable RLS; and scope user data to the signed-in user. The second migration limits live AI generation to 30 requests per user per UTC day. The third migration creates a private `source-media` bucket (512 MB per object) with per-user Storage policies. The fourth migration adds a service-role-only job claim/complete/fail queue with retry and stale-lease recovery. No migrations have been applied to a database.
 
 ## API
-`POST /api/generate` accepts script, language, tone, and count. `GET /api/usage` returns the signed-in user's daily quota. `POST /api/media/upload-url` creates a short-lived signed upload token for a validated audio/video file. `GET /api/media/jobs` lists the current user's media jobs; `PATCH /api/media/jobs` confirms an uploaded object exists. The API validates input and uses the OpenAI Chat Completions API only from the server. If no key is present, it returns an explicitly marked demo result.
+`POST /api/generate` accepts script, language, tone, and count. `GET /api/usage` returns the signed-in user's daily quota. `POST /api/media/upload-url` creates a short-lived signed upload token for a validated audio/video file. `GET /api/media/jobs` lists the current user's media jobs; `PATCH /api/media/jobs` confirms an uploaded object exists. The media worker is in `workers/media-processor/` and requires its own secrets and container deployment. The API validates input and uses the OpenAI Chat Completions API only from the server. If no key is present, it returns an explicitly marked demo result.
 
 ## Project documents
 - PROGRESS.md — progress tracker.
 - CHAT_HISTORY_AND_BLUEPRINT.md — conversation history and product blueprint.
 
 ## Not implemented yet
-Paid subscription/credit plans, upload progress/cancellation/resumable large-file transfers, Kinyarwanda transcription, audio/video inspection, clip selection, FFmpeg rendering, subtitles, background workers, publishing integrations, and production deployment.
+Paid subscription/credit plans, upload progress/cancellation/resumable large-file transfers, timestamped transcription, audio/video inspection, clip selection, FFmpeg rendering, subtitles, publishing integrations, and production deployment.
 
 ## Important
 This project is not production-ready until dependencies are installed, type/lint/build checks pass, auth and RLS are tested, secrets are configured securely, and real Kinyarwanda outputs are reviewed by fluent speakers. Provider pricing, availability, and model support can change; verify before launch.
 
 **Production safety:** The live AI endpoint requires a verified Supabase user when a billable AI key is configured. A basic daily usage ceiling is implemented in SQL/API code but is not active until the second migration is applied. Additional abuse protection, monitoring, and billing-grade credit accounting are still missing. Do not enable public paid AI usage until migrations and controls are tested.
+
+
+## Media transcription worker (separate cloud service)
+
+The worker is a Node 22 container under `workers/media-processor/`. It claims jobs through the fourth migration's service-role-only RPC, downloads private source media, calls Pindo's authenticated Kinyarwanda STT endpoint, and writes plain transcript text back to the job. Configure `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, and `PINDO_API_TOKEN` in the worker host's secret manager; never put the service-role key in the Next.js browser bundle or commit it. The default worker processing limit is 100 MiB even though storage allows 512 MiB. The transcript is not timestamped yet, and the worker must be deployed separately before uploaded jobs are processed.
+
+Provider documentation:
+- Pindo Speech-to-Text: https://docs.pindo.ai/docs/ai/stt
+- Pindo Voice AI overview: https://docs.pindo.ai/docs/ai/overview
+- Kinyarwanda support in Google Cloud Speech-to-Text is also documented: https://cloud.google.com/speech-to-text/docs/speech-to-text-supported-languages
+
+Before sending user media to any provider, obtain consent and review provider retention/privacy terms. Kinyarwanda quality still requires a consented Rwandan evaluation set and fluent-speaker review.
