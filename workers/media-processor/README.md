@@ -13,13 +13,14 @@ Cloud worker for processing authenticated uploads. It currently transcribes Kiny
 
 ## Run
 
-Build/deploy this directory as a long-running Node 22 container. Configure the environment variables in the worker host's secret manager. The worker polls `claim_media_job()`, downloads private source media, sends it to Pindo's authenticated Kinyarwanda STT endpoint, then stores the transcript through a service-role-only RPC.
+Build/deploy this directory as a long-running Node 22 container. Configure the environment variables in the worker host's secret manager. The worker polls `claim_media_job()`, downloads private source media, uses FFmpeg/ffprobe to validate duration and extract mono 16 kHz MP3 audio, sends that audio to Pindo's authenticated Kinyarwanda STT endpoint, then stores the transcript through a service-role-only RPC.
 
 ## Current limits
 
 - One job at a time per worker process; scale by running multiple replicas (the database queue uses row locks with SKIP LOCKED).
 - Kinyarwanda (`rw`) is the configured transcription language.
 - Files above 100 MiB are rejected by default by the worker even though source storage permits up to 512 MiB. Set a larger limit only after sizing worker memory and confirming provider limits.
+- Media longer than 2 hours is rejected by default. FFmpeg/ffprobe are installed in the worker container; audio is normalized to mono 16 kHz MP3 before provider submission.
 - Transcript is plain text, not word-timestamped. Clip detection, FFmpeg rendering, subtitles, and transcript editing are separate future stages.
 - A failed job retries up to three attempts; stale processing leases are reclaimable after 20 minutes.
 - Pindo receives the user's media. Before launch, obtain user consent and review Pindo's retention/privacy terms.
