@@ -380,3 +380,14 @@ Human-dependent setup that AI cannot safely infer: choose/create the correct ded
 - Updated global CSS across studio, auth, history, batch details, media and integrations. Existing feature logic and navigation were preserved.
 - Added `docs/design-system.md` to keep future implementation consistent.
 - Outstanding verification: inspect the running app at desktop/mobile sizes and confirm the new GitHub Actions run passes. The CSS has not been browser-rendered by the assistant.
+
+
+## 2026-11-17 — Evidence-led creator workflow upgrade
+- Researched 2026 creator workflow reports and official TikTok publishing requirements.
+- The research supports building a creator workflow around editing/repurposing, ideas and scripts, captions, performance insights, and scheduling, while preserving the creator's authentic voice.
+- Implemented a creator brief in the studio: content goal, target audience, and brand-voice notes. These settings are validated server-side and included in the generation prompt.
+- Added migration 6 to save the creator brief with each batch; the batch detail page displays the saved brief.
+- Added responsive styling and updated README.
+- Research references: 2026 Creator Landscape report; CreatorIQ State of Creator Marketing 2025–2026; TikTok Content Posting API Direct Post guide and Content Sharing Guidelines.
+- TikTok direct publishing remains gated on creator OAuth consent, scope approval, and app audit; unaudited direct posts are private-only. Never report publishing as enabled merely because client credentials exist.
+- Current verification: changes are committed, but migration 6 has not been applied and the latest code has not yet passed an observed CI/build or browser QA run.
