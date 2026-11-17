@@ -18,7 +18,7 @@ export async function GET() {
 
   const { data, error } = await auth.supabase
     .from("media_jobs")
-    .select("id,original_filename,mime_type,size_bytes,status,duration_seconds,created_at,updated_at")
+    .select("id,original_filename,mime_type,size_bytes,status,duration_seconds,transcript,last_error,created_at,updated_at")
     .eq("user_id", auth.user.id)
     .order("created_at", { ascending: false })
     .limit(50);
