@@ -132,3 +132,13 @@ There is no project clearly named ViralBatch. The FREE-CROSSPOSTER project must 
 - Human bootstrap still required: after the dedicated ViralBatch database is confirmed and migration 5 is reviewed/applied, the project owner must assign the first admin with the documented one-time SQL. Provider secrets must be configured in server-side secret settings.
 - Important limitation: social platform entries currently detect app credentials only. OAuth login, creator-account consent, token refresh/storage, publishing scopes, and app review are not yet implemented. No platform publishing is falsely marked as fully connected.
 - No database migrations or live API connections were executed; the dedicated ViralBatch Supabase project and provider secrets remain unconfigured.
+
+
+## Visual design refresh — 2026-11-17
+- Replaced the previous purple/lavender-heavy visual treatment with a warm creator-workspace system: off-white canvas, white surfaces, deep forest-charcoal text, and emerald/mint actions.
+- Added shared semantic tokens and matching dark palette; dark mode follows the operating-system preference.
+- Refreshed studio, sidebar, topbar, editor controls, results, history, batch detail, media upload, auth and integrations surfaces.
+- Added responsive integration-card layout, visible focus styling, restrained borders/shadows, and reduced-motion support.
+- Preserved the existing React workflows and route structure; no product functionality was intentionally removed.
+- Documented palette, typography, spacing, navigation, page structure, responsive rules and accessibility expectations in `docs/design-system.md`.
+- Not yet visually browser-tested. GitHub Actions must confirm lint/typecheck/build after these changes; do not call the redesign fully verified until then.
