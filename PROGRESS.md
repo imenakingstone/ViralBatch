@@ -142,3 +142,25 @@ There is no project clearly named ViralBatch. The FREE-CROSSPOSTER project must 
 - Preserved the existing React workflows and route structure; no product functionality was intentionally removed.
 - Documented palette, typography, spacing, navigation, page structure, responsive rules and accessibility expectations in `docs/design-system.md`.
 - Not yet visually browser-tested. GitHub Actions must confirm lint/typecheck/build after these changes; do not call the redesign fully verified until then.
+
+
+## Product research and creator-brief upgrade — 2026-11-17
+
+### Research findings
+- The 2026 Creator Landscape report identifies editing, idea generation, script/caption writing, analytics, and automation/scheduling as meaningful creator AI workflows; it explicitly frames AI as a productivity aid that should preserve creator authenticity.
+- CreatorIQ's 2025–2026 State of Creator Marketing reports widespread AI use by brands/agencies, with short-form content generation, research/analysis, editing, performance reporting, and repurposing among common applications.
+- TikTok's official Content Posting API requires creator information and explicit consent in the direct-post flow; unaudited clients are restricted to private-view posts. This is why ViralBatch must not label platform credentials alone as a live publishing connection.
+- Research sources: https://theinfluencermarketingfactory.com/wp-content/uploads/2026/02/Creator-Economy-Report-2026.pdf ; https://hs-21030792.f.hubspotemail.net/hubfs/21030792/2025-26%20State%20of%20Creator%20Marketing/CreatorIQ-StateofCreatorMarketing2025-2026.pdf ; https://developers.tiktok.com/docs/en/content-posting-api-get-started ; https://developers.tiktok.com/docs/en/content-sharing-guidelines
+
+### Implemented from research
+- Added a content-goal selector: grow audience, educate audience, build community, drive sales, or increase engagement.
+- Added optional target-audience and brand-voice inputs with strict length limits.
+- Generation API now passes these settings to the AI prompt so calls to action, framing, and tone can be tailored without inventing facts.
+- Saved batches now persist this brief, and batch detail displays it.
+- Added migration 6: `supabase/migrations/202611170006_creator_context.sql`.
+- Updated responsive styling and README/API documentation.
+
+### Verification and dependencies
+- Code is committed to GitHub main. The new migration is not applied to Supabase; save operations using the new fields require migration 6.
+- No browser visual QA, typecheck, lint, production build, or live AI request has been run for this change yet.
+- Continue next with content calendar/planning, hook review/scoring with transparent explanations, and analytics once real platform account connections and permissioned metrics exist. Do not fabricate analytics or schedule/publish posts without authorized platform OAuth.
