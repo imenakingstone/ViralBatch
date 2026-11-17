@@ -7,7 +7,7 @@ const platforms = ["TikTok", "Instagram Reels", "YouTube Shorts"] as const;
 type Platform = (typeof platforms)[number];
 
 function demoOutput(script: string, language: string, count: number) {
-  const first = script.split(/[.!?\\n]/).map(s => s.trim()).find(Boolean) || script;
+  const first = script.split(/[.!?\n]/).map(s => s.trim()).find(Boolean) || script;
   const seed = first.length > 100 ? first.slice(0, 97) + "..." : first;
   const kinya = language === "Kinyarwanda" || language.startsWith("Mixed");
   const hooks = kinya
@@ -15,9 +15,9 @@ function demoOutput(script: string, language: string, count: number) {
     : ["The truth about this might change how you think: " + seed, "Stop scrolling if you've ever wondered about this.", "Here's the part most people miss: " + seed, "One simple shift can make a bigger difference than you think.", "Before you try anything else, hear this.", "I wish more people knew this sooner.", "This is your reminder to make the simple things work.", "Let's break down what actually matters.", "The biggest lesson? Start with what you already have.", "Save this idea for the next time you need it."];
   const selected = Array.from({ length: count }, (_, i) => hooks[i % hooks.length]);
   const base = kinya
-    ? "Igitekerezo cyiza gikwiye gusangizwa abantu benshi. Dore isomo twakuramo: " + seed + "\\n\\nWowe ubibona ute? Sangiza abandi igitekerezo cyawe.\\n\\n#Kinyarwanda #Rwanda #ViralBatch"
-    : "A good idea deserves more than one moment. Here's the takeaway: " + seed + "\\n\\nWhat would you add? Share your thoughts below and save this for later.\\n\\n#CreatorTips #ContentIdeas #ViralBatch";
-  const captions = Object.fromEntries(platforms.map(p => [p, base + (p === "TikTok" ? "\\n#TikTok" : p === "Instagram Reels" ? "\\n#Reels #Instagram" : "\\n#Shorts #YouTube")])) as Record<Platform, string>;
+    ? "Igitekerezo cyiza gikwiye gusangizwa abantu benshi. Dore isomo twakuramo: " + seed + "\n\nWowe ubibona ute? Sangiza abandi igitekerezo cyawe.\n\n#Kinyarwanda #Rwanda #ViralBatch"
+    : "A good idea deserves more than one moment. Here's the takeaway: " + seed + "\n\nWhat would you add? Share your thoughts below and save this for later.\n\n#CreatorTips #ContentIdeas #ViralBatch";
+  const captions = Object.fromEntries(platforms.map(p => [p, base + (p === "TikTok" ? "\n#TikTok" : p === "Instagram Reels" ? "\n#Reels #Instagram" : "\n#Shorts #YouTube")])) as Record<Platform, string>;
   return {
     hooks: selected,
     captions,
