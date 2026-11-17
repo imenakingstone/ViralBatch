@@ -25,6 +25,9 @@ export default function Home() {
   const [saveStatus, setSaveStatus] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const [usage, setUsage] = useState<{ used: number; remaining: number; dailyLimit: number } | null>(null);
+  const [mediaFile, setMediaFile] = useState<File | null>(null);
+  const [mediaStatus, setMediaStatus] = useState("");
+  const [mediaBusy, setMediaBusy] = useState(false);
   const words = useMemo(() => script.trim() ? script.trim().split(/\s+/).length : 0, [script]);
 
   useEffect(() => {
@@ -34,6 +37,29 @@ export default function Home() {
     }).catch(() => undefined);
     return () => { active = false; };
   }, []);
+
+  async function uploadMedia() {
+    if (!mediaFile) { setMediaStatus("Choose a video or audio file first."); return; }
+    setMediaBusy(true); setMediaStatus("Preparing secure upload...");
+    try {
+      const response = await fetch("/api/media/upload-url", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ filename: mediaFile.name, contentType: mediaFile.type, sizeBytes: mediaFile.size }) });
+      const details = await response.json();
+      if (!response.ok) throw new Error(details.error || "Could not prepare upload.");
+      const supabase = createSupabaseClient();
+      if (!supabase) { router.push("/login?error=setup"); return; }
+      setMediaStatus("Uploading your file...");
+      const { error: uploadError } = await supabase.storage.from("source-media").uploadToSignedUrl(details.path, details.token, mediaFile, { contentType: mediaFile.type, upsert: false });
+      if (uploadError) throw new Error(uploadError.message);
+      const confirmResponse = await fetch("/api/media/jobs", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ jobId: details.jobId }) });
+      const confirmation = await confirmResponse.json();
+      if (!confirmResponse.ok) throw new Error(confirmation.error || "Upload saved but could not be confirmed.");
+      setMediaStatus("Upload complete. Your file is securely stored and ready for transcription processing.");
+      setMediaFile(null);
+      const fileInput = document.getElementById("media-file") as HTMLInputElement | null;
+      if (fileInput) fileInput.value = "";
+    } catch (e) { setMediaStatus(e instanceof Error ? e.message : "Upload failed. Please try again."); }
+    finally { setMediaBusy(false); }
+  }
 
   async function generate() {
     if (script.trim().length < 20) { setError("Add at least 20 characters so ViralBatch has enough context."); return; }
@@ -118,6 +144,16 @@ export default function Home() {
             <div className="rail-card roadmap" id="roadmap"><div className="roadmap-kicker">ON THE ROADMAP <span>COMING NEXT</span></div><h3>From script to screen.</h3><p>Audio transcription, smart clip suggestions and subtitle-ready exports are next in the studio.</p><div className="roadmap-bar"><i/></div><small>Text studio · First milestone</small></div>
           </aside>
         </div>
+        <section className="panel media-panel">
+          <div className="panel-title"><div className="step">02</div><div><h2>Bring in a video or audio file</h2><p>Securely upload source media for the upcoming transcription and clipping tools.</p></div><span className="editor-tag">MEDIA BETA</span></div>
+          <div className="media-upload-row">
+            <label className="media-file-picker" htmlFor="media-file"><FileText size={19}/><span>{mediaFile ? mediaFile.name : "Choose video or audio"}</span><small>{mediaFile ? (mediaFile.size / (1024 * 1024)).toFixed(1) + " MB" : "MP4 · MOV · WebM · MP3 · WAV · AAC · max 512 MB"}</small></label>
+            <input id="media-file" type="file" accept="video/mp4,video/quicktime,video/webm,audio/mpeg,audio/mp4,audio/wav,audio/x-wav,audio/aac,audio/webm" onChange={e => { setMediaFile(e.target.files?.[0] || null); setMediaStatus(""); }}/>
+            <button className="upload-button" onClick={uploadMedia} disabled={!mediaFile || mediaBusy}>{mediaBusy ? "Uploading..." : "Upload media"}<ArrowRight size={16}/></button>
+          </div>
+          {mediaStatus && <p className="media-status" role="status">{mediaStatus}</p>}
+          <p className="media-note"><BadgeCheck size={14}/> Private storage. Only your account can access your uploaded files. Transcription and clip processing are not connected yet.</p>
+        </section>
         <section className="results" id="results"><div className="results-head"><div><div className="eyebrow">02 / YOUR CONTENT BATCH</div><h2>{batch ? "Your ideas are ready." : "Your next batch starts here."}</h2><p>{batch ? "Edit any result before you copy or export it." : "Generate your first batch to see hooks and platform-ready captions here."}</p></div>{batch && <div className="result-actions"><button className="save-button" onClick={saveBatch}>Save batch</button><button className="export" onClick={exportCsv}><ArrowDownToLine size={16}/> Export CSV</button></div>}</div>
           {!batch ? <div className="empty"><div className="empty-art"><span><Sparkles size={17}/></span><span><FileText size={18}/></span><b><WandSparkles size={25}/></b><span><Play size={16}/></span></div><h3>Good ideas deserve a bigger audience.</h3><p>Your generated hooks, captions and hashtags will appear here.</p></div> : <div className="output-grid">
             <div><div className="output-subhead"><h3>Hook ideas <span>{batch.hooks.length}</span></h3><button onClick={() => copyText(batch.hooks.map((h, i) => (i + 1) + ". " + h).join("\n"), "hooks")}>{copied === "hooks" ? <Check size={14}/> : <Copy size={14}/>} {copied === "hooks" ? "Copied" : "Copy all"}</button></div>
