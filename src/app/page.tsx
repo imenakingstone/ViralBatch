@@ -8,6 +8,7 @@ import { AudioLines, ArrowDownToLine, ArrowRight, BadgeCheck, Check, ChevronDown
 
 type Platform = "TikTok" | "Instagram Reels" | "YouTube Shorts";
 type Batch = { hooks: string[]; captions: Record<Platform, string>; hashtags: string[]; mode: "ai" | "demo" };
+type MediaJob = { id: string; original_filename: string; mime_type: string; size_bytes: number; status: string; transcript: { text?: string; language?: string; provider?: string } | null; last_error: string | null; created_at: string };
 const platforms: Platform[] = ["TikTok", "Instagram Reels", "YouTube Shorts"];
 const starter = "Most creators don't need more ideas. They need a simple system to turn one good idea into a week of content. Start with one useful story, find the strongest moment, and share it in a way that feels natural on every platform.";
 
@@ -28,12 +29,21 @@ export default function Home() {
   const [mediaFile, setMediaFile] = useState<File | null>(null);
   const [mediaStatus, setMediaStatus] = useState("");
   const [mediaBusy, setMediaBusy] = useState(false);
+  const [mediaJobs, setMediaJobs] = useState<MediaJob[]>([]);
   const words = useMemo(() => script.trim() ? script.trim().split(/\s+/).length : 0, [script]);
 
   useEffect(() => {
     let active = true;
     fetch("/api/usage").then(async response => response.ok ? response.json() : null).then(data => {
       if (active && data && Number.isFinite(data.remaining)) setUsage(data);
+    }).catch(() => undefined);
+    return () => { active = false; };
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    fetch("/api/media/jobs").then(async response => response.ok ? response.json() : null).then(data => {
+      if (active && Array.isArray(data?.jobs)) setMediaJobs(data.jobs);
     }).catch(() => undefined);
     return () => { active = false; };
   }, []);
@@ -53,7 +63,10 @@ export default function Home() {
       const confirmResponse = await fetch("/api/media/jobs", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ jobId: details.jobId }) });
       const confirmation = await confirmResponse.json();
       if (!confirmResponse.ok) throw new Error(confirmation.error || "Upload saved but could not be confirmed.");
-      setMediaStatus("Upload complete. Your file is securely stored and ready for transcription processing.");
+      setMediaStatus("Upload complete. Your file is securely stored and queued for transcription.");
+      const jobsResponse = await fetch("/api/media/jobs");
+      const jobsData = await jobsResponse.json().catch(() => null);
+      if (jobsResponse.ok && Array.isArray(jobsData?.jobs)) setMediaJobs(jobsData.jobs);
       setMediaFile(null);
       const fileInput = document.getElementById("media-file") as HTMLInputElement | null;
       if (fileInput) fileInput.value = "";
@@ -152,6 +165,12 @@ export default function Home() {
             <button className="upload-button" onClick={uploadMedia} disabled={!mediaFile || mediaBusy}>{mediaBusy ? "Uploading..." : "Upload media"}<ArrowRight size={16}/></button>
           </div>
           {mediaStatus && <p className="media-status" role="status">{mediaStatus}</p>}
+          {mediaJobs.length > 0 && <div className="media-jobs"><div className="media-jobs-heading"><b>Your media jobs</b><button type="button" onClick={async () => { const response = await fetch("/api/media/jobs"); const data = await response.json().catch(() => null); if (response.ok && Array.isArray(data?.jobs)) setMediaJobs(data.jobs); }}>Refresh status</button></div>
+            {mediaJobs.map(job => <article className="media-job" key={job.id}><div className="media-job-meta"><b>{job.original_filename}</b><span className={"job-status status-" + job.status}>{job.status.replaceAll("_", " ")}</span></div>
+              {job.transcript?.text && <div className="media-transcript"><small>TRANSCRIPT · {job.transcript.language || "rw"} · {job.transcript.provider || "AI"}</small><p>{job.transcript.text}</p></div>}
+              {job.last_error && <p className="media-job-error">{job.last_error}</p>}
+            </article>)}
+          </div>}
           <p className="media-note"><BadgeCheck size={14}/> Private storage. Only your account can access your uploaded files. Transcription and clip processing are not connected yet.</p>
         </section>
         <section className="results" id="results"><div className="results-head"><div><div className="eyebrow">02 / YOUR CONTENT BATCH</div><h2>{batch ? "Your ideas are ready." : "Your next batch starts here."}</h2><p>{batch ? "Edit any result before you copy or export it." : "Generate your first batch to see hooks and platform-ready captions here."}</p></div>{batch && <div className="result-actions"><button className="save-button" onClick={saveBatch}>Save batch</button><button className="export" onClick={exportCsv}><ArrowDownToLine size={16}/> Export CSV</button></div>}</div>
