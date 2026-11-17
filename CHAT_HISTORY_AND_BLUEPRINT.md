@@ -305,3 +305,6 @@ Authentication, Supabase client integration, save/load history, real usage meter
 - No existing Supabase project was selected or modified because the connected account's project list did not contain a project clearly identified as ViralBatch.
 
 Important remaining safety work: do not expose the AI generation endpoint with a billable key to public traffic until authentication is enforced on that endpoint and durable rate limits/usage metering are implemented. The current sign-in flow protects saved batch writes via RLS but does not yet gate the generation API.
+
+- Added a saved-batch history page at `/batches`, protected by server-side Supabase Auth checks and backed by the per-user RLS policy.
+- Added Dependabot configuration for weekly npm and GitHub Actions dependency updates.
