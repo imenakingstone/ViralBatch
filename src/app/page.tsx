@@ -74,7 +74,7 @@ export default function Home() {
       <a className="brand" href="#"><span className="brand-icon"><AudioLines size={21}/></span><span>viral<span>batch</span><sup>AI</sup></span></a>
       <div className="workspace"><div className="workspace-avatar">V</div><div><b>Creator workspace</b><small>Preview workspace</small></div><ChevronDown size={15}/></div>
       <p className="nav-label">WORKSPACE</p>
-      <nav><a className="nav-link selected" href="#studio"><WandSparkles size={17}/> Content studio <i/></a><a className="nav-link" href="#results"><FileText size={17}/> My batches</a><a className="nav-link muted" href="#roadmap"><Clapperboard size={17}/> Video tools <span>SOON</span></a></nav>
+      <nav><a className="nav-link selected" href="#studio"><WandSparkles size={17}/> Content studio <i/></a><a className="nav-link" href="/batches"><FileText size={17}/> My batches</a><a className="nav-link muted" href="#roadmap"><Clapperboard size={17}/> Video tools <span>SOON</span></a></nav>
       <div className="sidebar-bottom"><div className="plan-card"><div className="plan-icon"><Zap size={16}/></div><b>Your creative runway</b><p>Explore the studio in preview mode. Connect an AI key to generate live content.</p><div className="plan-line"><i/></div><small>AI provider setup is the next step.</small></div><div className="user-row"><div className="user-avatar">VK</div><div><b>My workspace</b><small>Preview account</small></div><ChevronDown size={15}/></div></div>
     </aside>
     <section className="main">
