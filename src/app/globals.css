@@ -11,3 +11,12 @@
 @media(max-width:500px){.auth-card{padding:25px 20px}.result-actions{flex-direction:column;align-items:stretch}.result-actions button{justify-content:center}}
 
 .history-page{min-height:100vh;background:var(--bg)}.history-top{height:70px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 max(24px,calc((100vw - 1120px)/2))}.history-top .back-link{display:flex;align-items:center;gap:7px;margin:0}.history-content{max-width:900px;margin:0 auto;padding:60px 25px}.history-content h1{font:800 34px Manrope;letter-spacing:-1.3px;margin:12px 0 6px}.history-intro{font-size:12px;color:var(--muted);margin:0 0 28px}.batch-list{display:grid;gap:10px}.batch-item{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;align-items:center;gap:13px}.batch-symbol,.history-icon{width:39px;height:39px;display:grid;place-items:center;background:var(--lav);color:var(--purple);border-radius:11px}.batch-copy{flex:1;min-width:0}.batch-copy h2{font:700 13px Manrope;margin:0 0 5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.batch-copy p{font-size:10px;color:#9699a8;margin:0}.batch-label{font-size:8px;font-weight:800;letter-spacing:.8px;color:var(--green);background:#eafaf3;padding:6px 8px;border-radius:6px}.history-empty{background:#fff;border:1px solid var(--line);border-radius:14px;text-align:center;padding:45px 20px}.history-icon{margin:0 auto 15px;width:48px;height:48px;border-radius:15px}.history-empty h2{font:800 16px Manrope;margin:0 0 7px}.history-empty p{font-size:11px;color:var(--muted);max-width:390px;margin:0 auto 18px;line-height:1.6}.history-cta{display:inline-flex;background:var(--purple);color:white;text-decoration:none;padding:10px 15px;border-radius:8px;font-size:10px;font-weight:700}
+
+
+/* Saved-batch management */
+.batch-controls{display:flex;align-items:center;gap:12px;margin-left:auto}
+.batch-controls form{margin:0}
+.batch-delete{border:1px solid rgba(255,255,255,.13);background:transparent;color:#c4c9d4;border-radius:8px;padding:7px 11px;font:inherit;font-size:12px;cursor:pointer}
+.batch-delete:hover{border-color:#ef7777;color:#ff9b9b}
+.batch-item{gap:16px}
+@media(max-width:560px){.batch-controls{align-items:flex-end;flex-direction:column;gap:7px}.batch-item{align-items:flex-start}}
