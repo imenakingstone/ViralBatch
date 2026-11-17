@@ -24,8 +24,8 @@ export default async function IntegrationsPage() {
       <p className="integration-intro">ViralBatch checks server-side credentials and activates capabilities when their provider is configured.</p>
       <div className="role-banner"><div><b>Your workspace role</b><small>{admin ? "You can review all provider configuration." : "You can use services enabled by your workspace administrator."}</small></div><span>{String(profile.role).toUpperCase()}</span></div>
       <div className="integration-grid">{integrations.map(item => {
-        const missing = item.env.filter(key => !process.env[key]);
-        const connected = missing.length === 0;
+        const missing = item.missing;
+        const connected = item.connected;
         return <article className="integration-card" key={item.id}>
           <div className="integration-card-head"><div className="integration-symbol"><KeyRound size={19}/></div><span className={connected ? "integration-state ready" : "integration-state"}>{connected ? <CheckCircle2 size={13}/> : <Circle size={13}/>} {connected ? "CONFIGURED" : "NOT CONNECTED"}</span></div>
           <h2>{item.name}</h2><p>{item.description}</p>
