@@ -32,7 +32,7 @@ Default branch: `main`
 - Storage object RLS policies isolate each user's folder.
 - Authenticated signed-upload URL endpoint validates file type/size and creates an awaiting-upload job.
 - Authenticated media jobs endpoint lists a user's jobs and confirms an uploaded object exists before marking it uploaded.
-- This is the secure backend foundation only: the browser upload UI, transcription, analysis, clip rendering, and background worker are not implemented.
+- Browser upload UI uses the signed upload token, displays progress/status, and confirms the upload. This is source-media storage only; transcription, analysis, clip rendering, and background worker are not implemented.
 
 ### Engineering
 - GitHub Actions workflow for install, typecheck, lint, and production build.
@@ -61,7 +61,7 @@ There is no project clearly named ViralBatch. The FREE-CROSSPOSTER project must 
 - No secrets were committed and no paid infrastructure or deployment was created.
 
 ## Still not implemented
-- Browser upload interface with progress, cancellation, and retry.
+- Upload progress/cancellation/retry and resumable uploads for large files.
 - File metadata/duration probing and upload-completion hardening.
 - Kinyarwanda/English speech-to-text benchmarking and transcription.
 - Timestamped transcript editor.
@@ -97,4 +97,5 @@ There is no project clearly named ViralBatch. The FREE-CROSSPOSTER project must 
 - Fixed lint findings discovered in GitHub Actions: escaped JSX apostrophes and switched internal navigation to Next.js Link/router APIs.
 - Added the third migration for private media storage and owner-scoped media jobs.
 - Added authenticated signed-upload URL creation, upload job listing, and upload confirmation APIs.
+- Added a browser upload panel wired to Supabase Storage signed uploads, with file type/size selection and success/error states.
 - Updated README and master blueprint with current capabilities and remaining human approvals.
