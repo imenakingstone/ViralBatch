@@ -128,3 +128,7 @@ _Last updated: 2026-11-17_
 - Added Supabase SSR browser/server clients, Next.js 16 proxy session refresh, email/password sign-in and sign-up actions, email confirmation callback, and a save-batch action. These features remain configuration-dependent and are not verified against a live Supabase project.
 - Added a Save batch control that writes to the RLS-protected `batches` table for the authenticated user. It will only work after the correct Supabase project is configured and the migration is applied.
 - Supabase account project list did not include a project named ViralBatch. Existing projects were left untouched; the intended database still needs to be confirmed.
+
+- Added authenticated saved-batch history at `/batches`; the page reads only the current user's rows through Supabase RLS and shows a setup/migration message if the table is unavailable.
+- Added weekly Dependabot updates for npm packages and GitHub Actions.
+- The UI now includes a sign-in link, a Save batch action, and a My batches route. All account/database actions remain unverified until a correct Supabase project is configured.
