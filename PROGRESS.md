@@ -124,3 +124,7 @@ _Last updated: 2026-11-17_
 - Supabase account inspection found three existing projects, none named ViralBatch. No database migration was applied because the correct target project is not confirmed; do not use an unrelated existing project.
 - Current stable package versions were checked on npm: Next.js 16.4.6 and React 19.3.1. Official Next.js installation guidance recommends the App Router and TypeScript foundation. Supabase RLS guidance informed the explicit authenticated-role grants, per-user policies, and indexed ownership column.
 - The live generation endpoint currently has no authentication or durable rate limiting. Do not deploy it with a paid AI key until authentication, abuse controls, and usage limits are implemented.
+
+- Added Supabase SSR browser/server clients, Next.js 16 proxy session refresh, email/password sign-in and sign-up actions, email confirmation callback, and a save-batch action. These features remain configuration-dependent and are not verified against a live Supabase project.
+- Added a Save batch control that writes to the RLS-protected `batches` table for the authenticated user. It will only work after the correct Supabase project is configured and the migration is applied.
+- Supabase account project list did not include a project named ViralBatch. Existing projects were left untouched; the intended database still needs to be confirmed.
