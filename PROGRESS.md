@@ -87,3 +87,36 @@ _Last updated: 2026-11-17_
 - Confirmed `README.md` exists.
 - Confirmed `PROGRESS.md` and `CHAT_HISTORY_AND_BLUEPRINT.md` were not present before this documentation setup.
 - Next: verify the new documentation commits and inspect Supabase/repository state before implementation.
+
+
+## Implementation update — 2026-11-17 (AI build session)
+
+### Implemented and committed to GitHub
+- Initialized a Next.js App Router + TypeScript project structure under `src/app`.
+- Added a responsive ViralBatch content-studio interface with script input, word/character count, language/tone/hook-count controls, editable hook results, platform caption tabs, copy actions, and CSV export.
+- Added a server-side `POST /api/generate` endpoint with input validation, output shape checks, timeout handling, and server-only OpenAI API key access.
+- Added a clearly labeled deterministic preview mode when `OPENAI_API_KEY` is not configured. Preview output is not represented as live AI output.
+- Added `.env.example` without secrets and a README with Codespaces setup instructions.
+- Added a Supabase SQL migration for profiles and saved batches, including authenticated-only grants, RLS policies, user ownership checks, and a new-user profile trigger. The migration is committed but has NOT been applied to Supabase.
+- Added a GitHub Actions workflow to install dependencies and run typecheck, lint, and production build on pushes and pull requests.
+- Updated dependencies to the current stable Next.js 16.4.6 and React 19.3.1 based on the npm package registry check on 2026-11-17.
+
+### Not yet verified
+- No Codespaces terminal execution was available through the GitHub repository connector, so `npm install`, typecheck, lint, and production build have NOT been run by the assistant.
+- GitHub Actions workflow has been committed; its run result must be checked in the repository Actions tab.
+- No live AI key is configured or tested.
+- Supabase project identity was not confirmed and no database changes were applied.
+- No user authentication, persistent batch saving, credits, billing, transcription, video processing, or publishing integrations are implemented yet.
+
+### Exact next steps
+1. In the existing Codespace, run `npm install`, then `npm run typecheck`, `npm run lint`, and `npm run build`; share any errors for fixes.
+2. Check GitHub Actions for the automated validation result.
+3. Confirm the correct Supabase project, then review and apply `supabase/migrations/202611170001_initial_schema.sql` only after approval.
+4. Add a server-side `OPENAI_API_KEY` to Codespaces Secrets or deployment environment variables if live generation is desired; never commit it.
+5. Implement Supabase Auth and save/load batch history after the project URL and publishable key are configured.
+6. Have fluent Kinyarwanda speakers review generated copy before public use.
+
+### Safety and scope notes
+- No secrets were added to the repository.
+- No paid resources were created, no deployment was triggered, and no database was modified.
+- Preview mode is for interface testing only; it does not replace a configured AI provider.
