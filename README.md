@@ -42,7 +42,7 @@ OPENAI_MODEL=gpt-4o-mini
 
 Restart the development server after changing environment variables. Never add a real key to Git, client-side code, screenshots, or chat. The app uses demo output when no key is configured; demo output is not a live AI response and should be reviewed before publication.
 
-## Supabase setup (human approval required)
+## Supabase setup (project initialized; app configuration still required)
 1. Confirm the intended Supabase project.
 2. Review all six SQL files in `supabase/migrations/` in filename order.
 3. Apply all six migrations in the Supabase SQL Editor only after confirming the project and reviewing the SQL.
@@ -63,7 +63,7 @@ Paid subscription/credit plans, upload progress/cancellation/resumable large-fil
 ## Important
 This project is not production-ready until dependencies are installed, type/lint/build checks pass, auth and RLS are tested, secrets are configured securely, and real Kinyarwanda outputs are reviewed by fluent speakers. Provider pricing, availability, and model support can change; verify before launch.
 
-**Production safety:** The live AI endpoint requires a verified Supabase user when a billable AI key is configured. A basic daily usage ceiling is implemented in SQL/API code but is not active until the second migration is applied. Additional abuse protection, monitoring, and billing-grade credit accounting are still missing. Do not enable public paid AI usage until migrations and controls are tested.
+**Production safety:** The live AI endpoint requires a verified Supabase user when a billable AI key is configured. A basic daily usage ceiling is implemented in SQL/API code and its database migration is applied; live behavior still needs an authenticated end-to-end test. Additional abuse protection, monitoring, and billing-grade credit accounting are still missing. Do not enable public paid AI usage until migrations and controls are tested.
 
 
 ## Media transcription worker (separate cloud service)
@@ -81,7 +81,7 @@ Before sending user media to any provider, obtain consent and review provider re
 
 The fifth migration adds the admin, creator, and agency profile roles and an owner-scoped integration registry. The /integrations page checks server-side environment configuration and reports which capabilities are ready. GET /api/integrations returns the signed-in member's role and enabled capability identifiers. The admin-only role assignment RPC is exposed through PATCH /api/admin/members/role and cannot be used by creators or agencies.
 
-**First administrator bootstrap:** after confirming the correct ViralBatch Supabase project and applying migration 5, sign in with the account that should own the workspace, then run this one-time SQL in that project's SQL Editor, replacing the email with the exact account email:
+**First administrator bootstrap:** after configuring the app's Supabase environment, sign up with the account that should own the workspace, then run this one-time SQL in that project's SQL Editor, replacing the email with the exact account email:
 ```sql
 update public.profiles
 set role = 'admin', updated_at = now()
