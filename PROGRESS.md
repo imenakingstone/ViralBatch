@@ -1,6 +1,6 @@
 # ViralBatch — Project Progress
 
-_Last updated: 2026-11-17_
+_Last updated: 2026-11-18_
 
 ## Product
 ViralBatch is a cloud-first SaaS for turning scripts, transcripts, and eventually long videos/audio into batches of short-form hooks, captions, subtitles, and clips for TikTok, Instagram Reels, and YouTube Shorts. English, Kinyarwanda, mixed-language, and French text workflows are planned.
@@ -39,17 +39,21 @@ Default branch: `main`
 - Weekly Dependabot updates.
 - Environment example, README, master blueprint, and this progress tracker.
 
-## Database migrations — apply only to a confirmed ViralBatch project
-1. `202611170001_initial_schema.sql`: profiles, batches, signup trigger, and RLS.
-2. `202611170002_generation_usage.sql`: private generation ledger, atomic consume-credit RPC, and usage-summary RPC.
-3. `202611170003_media_pipeline.sql`: media jobs, private Storage bucket, and per-user Storage policies.
-
-**None of these migrations has been applied.** The connected Supabase account currently lists:
-- `MusicPlayer` — inactive
-- `glolex` — inactive
-- `FREE-CROSSPOSTER` — active
-
-There is no project clearly named ViralBatch. The FREE-CROSSPOSTER project must not be modified for ViralBatch without explicit confirmation that this is intentional. No new Supabase project was created.
+## Live database — ViralBatch Supabase (2026-11-18)
+- Confirmed dedicated project: `ViralBatch`, ref `hwzbpdkxcavljuakzrtp`, region `eu-west-1`, status `ACTIVE_HEALTHY`.
+- Project URL: `https://hwzbpdkxcavljuakzrtp.supabase.co`.
+- Applied all six repository migrations in order:
+  1. `202611170001_initial_schema`
+  2. `202611170002_generation_usage`
+  3. `202611170003_media_pipeline`
+  4. `202611170004_media_worker_queue`
+  5. `202611170005_roles_integrations`
+  6. `202611170006_creator_context`
+- Verified all six entries in Supabase migration history; verified the five public tables and RLS enabled on all five.
+- Verified the private `source-media` bucket exists with public access disabled.
+- The database is currently empty: zero Auth users, zero profiles, and zero saved batches. No user data was overwritten.
+- Security review: `generation_usage` intentionally has no direct client policy; clients use authenticated, user-scoped quota RPCs instead. Security advisor also flags the guarded SECURITY DEFINER RPCs and Supabase's platform-created `rls_auto_enable()` event-trigger function; inspect/documented guards were confirmed. The platform event-trigger function was not modified. Unused-index notices are expected on a new empty database.
+- Supabase's 2026 Data API change means public-schema tables may need explicit exposure in API settings. SQL grants and RLS are configured; verify Data API exposure if app requests return schema-cache/not-found errors.
 
 ## CI and verification
 - GitHub Actions successfully installed dependencies and passed TypeScript typecheck on the inspected run.
@@ -71,10 +75,11 @@ There is no project clearly named ViralBatch. The FREE-CROSSPOSTER project must 
 - Production deployment, monitoring, backups, and operational runbooks.
 
 ## Human approval / credentials still needed
-- Identify or create the dedicated ViralBatch Supabase project. The existing projects do not clearly match ViralBatch; selecting FREE-CROSSPOSTER would risk changing another application.
-- Add the dedicated project's URL and publishable key to Codespaces/deployment secrets.
-- Add the OpenAI API key securely after auth, RLS, and quota setup has been tested.
-- Review and apply the three migrations to the confirmed project.
+- Add `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` to the GitHub Codespaces environment for the ViralBatch repository. Use the publishable key only; never expose the service-role/secret key in browser variables.
+- Create the first account through ViralBatch sign-up, then assign that account the initial `admin` role using the one-time owner SQL documented in README.
+- Add `OPENAI_API_KEY` securely before enabling billable live generation.
+- Add worker-only `SUPABASE_SERVICE_ROLE_KEY` and `PINDO_API_TOKEN` in the worker host's secret manager; deploy the media worker separately.
+- Review provider privacy/retention and obtain user consent before transmitting customer media to Pindo.
 - Have a fluent Kinyarwanda speaker review generated/transcribed content before launch.
 - Approve production deployment, public launch, and any spending.
 
@@ -164,3 +169,12 @@ There is no project clearly named ViralBatch. The FREE-CROSSPOSTER project must 
 - Code is committed to GitHub main. The new migration is not applied to Supabase; save operations using the new fields require migration 6.
 - No browser visual QA, typecheck, lint, production build, or live AI request has been run for this change yet.
 - Continue next with content calendar/planning, hook review/scoring with transparent explanations, and analytics once real platform account connections and permissioned metrics exist. Do not fabricate analytics or schedule/publish posts without authorized platform OAuth.
+
+
+## Live Supabase initialization — 2026-11-18
+- The owner supplied the dedicated ViralBatch project URL; the connected Supabase account independently confirmed the matching project name/ref and healthy status.
+- AI applied the six migrations to this exact project and verified migration history, public tables, RLS flags, and the private media bucket.
+- No user account exists yet. First signup and first-admin bootstrap remain owner steps.
+- The Codespaces app environment is not automatically populated by connecting Supabase. Set the project URL and publishable key in Codespaces secrets/environment variables, then restart the dev server.
+- No service-role key, OpenAI key, or Pindo token was requested in chat, stored in Git, or configured.
+- Live auth, Data API connectivity, signup trigger, saved batch writes, generation quota RPC, upload flow, and worker processing are not yet end-to-end tested.
